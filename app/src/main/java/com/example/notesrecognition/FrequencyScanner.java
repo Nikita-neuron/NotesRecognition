@@ -4,18 +4,24 @@ import android.util.Log;
 
 import org.jtransforms.dct.DoubleDCT_1D;
 import org.jtransforms.fft.DoubleFFT_1D;
+
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+
 import jwave.*;
 import jwave.transforms.AncientEgyptianDecomposition;
 import jwave.transforms.DiscreteFourierTransform;
 import jwave.transforms.FastWaveletTransform;
 import jwave.transforms.wavelets.haar.Haar1;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class FrequencyScanner {
     private double[] window;
     double SinglePi = Math.PI;
     double DoublePi = 2*Math.PI;
 
-    public double extractFrequency(short[] sampleData, int sampleRate) {
+    public double[] extractFrequency(short[] sampleData, int sampleRate) {
 
         DoubleDCT_1D fft = new DoubleDCT_1D(sampleData.length + 24 * sampleData.length);
         double[] a = new double[(sampleData.length + 24 * sampleData.length) * 2];
@@ -36,7 +42,8 @@ public class FrequencyScanner {
             }
         }
         /* calculate the frequency */
-        return (double) sampleRate * maxInd / (a.length / 2);
+        double[] ans = new double[]{(double) sampleRate * maxInd / (a.length / 2)};
+        return a;
 
 
 //        double[] b = new double[sampleData.length];
@@ -84,6 +91,7 @@ public class FrequencyScanner {
         }
         return res;
     }
+
 
 
 

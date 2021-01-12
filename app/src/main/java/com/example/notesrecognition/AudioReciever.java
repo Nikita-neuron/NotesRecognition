@@ -47,8 +47,17 @@ public class AudioReciever{
                 try {
                     int data = audioRecord.read(buffer, 0, bufferSize);
 
-                    double res = frequencyScanner.extractFrequency(buffer, freq);
-                    handler.sendMessage(handler.obtainMessage((int) res));
+                    double[] res = frequencyScanner.extractFrequency(buffer, freq);
+                    String data1 = "\n";
+//                    for(int i = 0; i < res.length / 2; i++) {
+//                        Log.d("d", i+"");
+//                        Log.d("d", 8000 * i / (res.length / 2) + " : " + res[i]);
+//                        data1 += String.valueOf(v);
+//                        data1 += "\n";
+//                    }
+//                    Log.d("d", "-------");
+//                    Log.d("d", data1);
+                    handler.sendMessage(handler.obtainMessage(2, res));
 //                    Log.d("data", res+"");
 
                 } catch (Throwable t) {
