@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:background="#070B31"
+    android:gravity="center">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:ignore="ScrollViewCount">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/arrowBack"
+                        android:layout_alignParentEnd="true"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/arrow"
+                        android:layout_marginEnd="5dp"
+                        android:contentDescription="TODO" />
+                </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp">
+<!--                        <com.github.mikephil.charting.charts.BarChart-->
+<!--                            android:id="@+id/barchart"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent"/>-->
+                </LinearLayout>
+                    <Button
+                        android:id="@+id/btnSaveTab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="5dp"
+                        android:text="Сохранить"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="#F4F3F3"
+                    android:paddingTop="10dp"
+                    android:layout_marginBottom="50dp"
+                    android:layout_marginStart="10dp">
+
+                    <HorizontalScrollView
+                        android:id="@+id/horizontalScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fillViewport="true"
+                        tools:ignore="UselessParent">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                tools:ignore="ScrollViewSize">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/t"
+                                        android:layout_width="43dp"
+                                        android:layout_height="47dp"
+                                        android:layout_marginStart="19dp"
+                                        android:text="T"
+                                        android:textColor="#000"
+                                        android:textSize="45sp" />
+
+                                    <TextView
+                                        android:id="@+id/a"
+                                        android:layout_width="43dp"
+                                        android:layout_height="47dp"
+                                        android:layout_marginStart="19dp"
+                                        android:text="A"
+                                        android:textColor="#000"
+                                        android:textSize="45sp" />
+
+                                    <TextView
+                                        android:id="@+id/b"
+                                        android:layout_width="43dp"
+                                        android:layout_height="47dp"
+                                        android:layout_marginStart="19dp"
+                                        android:text="B"
+                                        android:textColor="#000"
+                                        android:textSize="45sp" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/strings"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <FrameLayout
+                                        android:id="@+id/line_1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="30dp"
+                                        android:scrollbars="horizontal">
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="15dp"
+                                            android:background="@drawable/line_1" />
+
+                                        <!--                    <TextView-->
+                                        <!--                        android:id="@+id/lad_1_1"-->
+                                        <!--                        android:layout_width="30dp"-->
+                                        <!--                        android:layout_height="30dp"-->
+                                        <!--                        android:layout_marginStart="100dp"-->
+                                        <!--                        android:background="@drawable/rectangle_2"-->
+                                        <!--                        android:paddingStart="7dp"-->
+                                        <!--                        android:text="1"-->
+                                        <!--                        android:textColor="#000"-->
+                                        <!--                        android:textSize="20sp"-->
+                                        <!--                        tools:ignore="RtlSymmetry" />-->
+
+                                    </FrameLayout>
+
+
+                                    <FrameLayout
+                                        android:id="@+id/line_2"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="30dp">
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="15dp"
+                                            android:background="@drawable/line_1" />
+
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:id="@+id/line_3"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="30dp">
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="15dp"
+                                            android:background="@drawable/line_1" />
+
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:id="@+id/line_4"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="30dp">
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="15dp"
+                                            android:background="@drawable/line_1" />
+
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:id="@+id/line_5"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="30dp">
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="15dp"
+                                            android:background="@drawable/line_1" />
+
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:id="@+id/line_6"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="30dp">
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="15dp"
+                                            android:background="@drawable/line_1" />
+
+                                    </FrameLayout>
+                                </LinearLayout>
+
+                                <View
+                                    android:id="@+id/line_left"
+                                    android:layout_width="1dp"
+                                    android:layout_height="150dp"
+                                    android:layout_marginTop="15dp"
+                                    android:background="@drawable/line_1" />
+                            </FrameLayout>
+
+                    </HorizontalScrollView>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp">
+
+            <!--        <Button-->
+            <!--            android:id="@+id/btnStart"-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:text="Старт"-->
+            <!--            android:layout_marginEnd="20dp"/>-->
+
+            <!--        <Button-->
+            <!--            android:id="@+id/btnPause"-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:text="Пауза"-->
+            <!--            android:layout_marginEnd="20dp"/>-->
+                    <ImageView
+                        android:id="@+id/btnPausePlay"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/play"
+                        android:layout_weight="2" />
+
+            <!--        <Button-->
+            <!--            android:id="@+id/btnStop"-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:text="Стоп" />-->
+
+
+                </LinearLayout>
+            </LinearLayout>
+    </ScrollView>
+</LinearLayout>

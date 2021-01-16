@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Notes Recognition</string>
+    <string name="cardID">Card</string>
+    <string name="cardFile">CardFile</string>
+    <string name="cardDelete">CardDelete</string>
+    <string name="cardDeleteID">CardDeleteID</string>
 </resources>
