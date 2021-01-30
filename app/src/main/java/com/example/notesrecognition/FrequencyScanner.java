@@ -20,6 +20,7 @@ public class FrequencyScanner {
     private double[] window;
     double SinglePi = Math.PI;
     double DoublePi = 2*Math.PI;
+    private final static double Q = 0.5;
 
     public double[] extractFrequency(short[] sampleData, int sampleRate) {
 
@@ -86,10 +87,27 @@ public class FrequencyScanner {
         double[] res = new double[input.length];
         buildHammWindow(input.length);
         for (int i = 0; i < input.length; ++i) {
-            res[i] = (double) input[i] * window[i];
+//            res[i] = (double) input[i] * window[i];
 //            res[i] = (double) input[i];
+            res[i] = (double) input[i] * BlackmannHarris(i, input.length);
         }
         return res;
+    }
+
+    public double Gausse(double n, double frameSize) {
+        double a = (frameSize - 1) / 2;
+        double t = (n - a) / (Q * a);
+        t = t * t;
+        return Math.exp(-t / 2);
+    }
+
+    public double Hann(double n, double frameSize) {
+        return 0.5 * (1 - Math.cos((2 * Math.PI * n) / (frameSize - 1)));
+    }
+
+    public double BlackmannHarris(double n, double frameSize) {
+        return 0.35875 - (0.48829 * Math.cos((2 * Math.PI * n) / (frameSize - 1))) +
+                (0.14128 * Math.cos((4 * Math.PI * n) / (frameSize - 1))) - (0.01168 * Math.cos((4 * Math.PI * n) / (frameSize - 1)));
     }
 
 

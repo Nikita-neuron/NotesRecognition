@@ -324,12 +324,14 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
             double im = spectrum[2 * i + 1];
             double mag = Math.sqrt(re * re + im * im);
 //            double mag = a[i];
+            // ограничить по частоте                        <--
+//            Log.d("freq", "mag: " + mag + " freq: " + (int) 12000 * i / (spectrum.length / 2));
             if (mag > maxMag) {
                 maxMag = mag;
                 maxInd = i;
             }
         }
-        int freq = (int) 8000 * maxInd / (spectrum.length / 2);
+        int freq = (int) 12000 * maxInd / (spectrum.length / 2);
 
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {
@@ -427,7 +429,6 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
             jsonWriter.endArray();
             jsonWriter.close();
 
-            Log.d("file", "Файл записан");
             save = true;
             Toast.makeText(this, "Файл записан", Toast.LENGTH_LONG).show();
         } catch (IOException e) {

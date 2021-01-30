@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 
 public class AudioReciever{
-    private final int freq = 8000;
+    private final int freq = 12000;
     private AudioRecord audioRecord;
     private Thread Rthread;
     private final Handler handler;
@@ -32,9 +32,11 @@ public class AudioReciever{
     protected void loopback() {
 
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        final int bufferSize = AudioRecord.getMinBufferSize(freq,
-                AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                AudioFormat.ENCODING_PCM_16BIT);
+        final int bufferSize = 16384;
+//        final int bufferSize = 8192;
+//        final int bufferSize = AudioRecord.getMinBufferSize(freq,
+//                AudioFormat.CHANNEL_CONFIGURATION_MONO,
+//                AudioFormat.ENCODING_PCM_16BIT);
 
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, freq,
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
