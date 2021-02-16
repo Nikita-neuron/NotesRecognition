@@ -14,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.JsonWriter;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -49,16 +51,16 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
     Bitmap playImage;
     Bitmap pauseImage;
 
-    Button btnStart;
-    Button btnStop;
+    Button btnClear;
     ImageView btnPausePlay;
     ImageView arrowBack;
-    Button btnSave;
+    ImageView btnSave;
     Button btnOpenTab;
     BarChart chart;
     FrameLayout[] frameLayouts;
     TextView textView;
     HorizontalScrollView scrollView;
+    TextView frequencyText;
 
     AudioReciever audioReciever;
     Handler handler;
@@ -110,12 +112,11 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
         width = displaymetrics.widthPixels;  // deprecated
         height = displaymetrics.heightPixels;  // deprecated
 
-        // кнопки начала, остановки распознования, кнопка назад
+        // кнопки начала, остановки распознования
 //        btnStart = findViewById(R.id.btnStart);
-//        btnStop = findViewById(R.id.btnStop);
+        btnClear = findViewById(R.id.btnClear);
         btnPausePlay = findViewById(R.id.btnPausePlay);
         btnSave = findViewById(R.id.btnSaveTab);
-        arrowBack = findViewById(R.id.arrowBack);
 
 //        chart = findViewById(R.id.barchart);
 
@@ -133,14 +134,20 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
         scrollView = findViewById(R.id.horizontalScroll);
 
 //        btnStart.setOnClickListener(this);
-//        btnStop.setOnClickListener(this);
+        btnClear.setOnClickListener(this);
         btnPausePlay.setOnClickListener(this);
         btnSave.setOnClickListener(this);
-        arrowBack.setOnClickListener(this);
+
+        frequencyText = findViewById(R.id.frequencyText);
 
         // картинки плея и паузы
         playImage = BitmapFactory.decodeResource(getResources(), R.drawable.play);
         pauseImage = BitmapFactory.decodeResource(getResources(), R.drawable.pause);
+
+        // кнопка назад
+        ActionBar actionBar =getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
 
         handler = new Handler() {
@@ -213,11 +220,27 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                reco = false;
+                btnPausePlay.setImageBitmap(playImage);
+                audioReciever.stop();
+
+                if (!save) {
+                    createDialog();
+                } else {
+                    Intent in = new Intent(this, MainActivity.class);
+                    startActivity(in);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onClick(View v) {
-//        if (v.getId() == R.id.btnStart) {
-//            reco = true;
-//            audioReciever.start();
-//        }
         switch (v.getId()) {
             case (R.id.btnPausePlay): {
                 // при нажатии на кнопку старт или пауза
@@ -245,18 +268,15 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
                 break;
             }
 
-            case (R.id.arrowBack): {
-                // при нажатии стрелочки назад
-                reco = false;
-                btnPausePlay.setImageBitmap(playImage);
-                audioReciever.stop();
-
-                if (!save) {
-                    createDialog();
+            case (R.id.btnClear): {
+                if(reco) {
+                    Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
                 } else {
-                    Intent in = new Intent(this, MainActivity.class);
-                    startActivity(in);
+                    btnPausePlay.setImageBitmap(playImage);
+                    audioReciever.stop();
+                    stopRec();
                 }
+                break;
             }
         }
 //        if (v.getId() == R.id.btnStop) {
@@ -331,7 +351,8 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
                 maxInd = i;
             }
         }
-        int freq = (int) 8000 * maxInd / (spectrum.length / 2);
+        int freq = (int) 24000 * maxInd / (spectrum.length / 2);
+        frequencyText.setText("Frequency: " + freq);
 
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {

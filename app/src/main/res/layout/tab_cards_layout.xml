@@ -23,15 +23,24 @@
                 android:orientation="vertical">
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
                     <ImageView
-                        android:id="@+id/arrowBack"
-                        android:layout_alignParentEnd="true"
-                        android:layout_width="60dp"
+                        android:id="@+id/btnSaveTab"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/save"/>
+                    <TextView
+                        android:id="@+id/frequencyText"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/arrow"
-                        android:layout_marginEnd="5dp"
-                        android:contentDescription="TODO" />
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:textColor="#fff"
+                        android:textSize="20sp"
+                        android:text="Frequency: 0"/>
+
                 </RelativeLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -41,13 +50,6 @@
 <!--                            android:layout_width="match_parent"-->
 <!--                            android:layout_height="match_parent"/>-->
                 </LinearLayout>
-                    <Button
-                        android:id="@+id/btnSaveTab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="5dp"
-                        android:text="Сохранить"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -216,35 +218,24 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:gravity="center"
                     android:layout_marginBottom="20dp">
 
-            <!--        <Button-->
-            <!--            android:id="@+id/btnStart"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:text="Старт"-->
-            <!--            android:layout_marginEnd="20dp"/>-->
-
-            <!--        <Button-->
-            <!--            android:id="@+id/btnPause"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:text="Пауза"-->
-            <!--            android:layout_marginEnd="20dp"/>-->
                     <ImageView
                         android:id="@+id/btnPausePlay"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         app:srcCompat="@drawable/play"
                         android:layout_weight="2" />
 
-            <!--        <Button-->
-            <!--            android:id="@+id/btnStop"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:text="Стоп" />-->
+                    <Button
+                        android:layout_weight="1"
+                        android:id="@+id/btnClear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="20dp"
+                        android:text="Очистить" />
 
 
                 </LinearLayout>

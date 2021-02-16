@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 
 public class AudioReciever{
-    private final int freq = 12000;
+    private final int freq = 24000;
     private AudioRecord audioRecord;
     private Thread Rthread;
     private final Handler handler;
