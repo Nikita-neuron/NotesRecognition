@@ -1,5 +1,10 @@
 // http://learn-android.ru/news/sozdanie_sostavnykh_view_obektov/2015-03-08-63.html
 
+// идеи:
+// 1. заменить запись в файл на запись в БД
+// 2. заменить кнопку плея при записи на значок микрофона
+// 3. может быть поменять белый фон на картинку гитары
+
 package com.example.notesrecognition;
 
 import android.Manifest;

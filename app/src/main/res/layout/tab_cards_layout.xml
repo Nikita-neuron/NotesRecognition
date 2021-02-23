@@ -8,10 +8,9 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
 
-    android:background="#070B31"
+    android:background="#0D1329"
 
     android:gravity="center">
-    <!--    android:background="#C7D0CC"-->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -53,9 +52,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="#F4F3F3"
-                    android:paddingTop="10dp"
+                    android:layout_height="180dp"
+                    android:background="#3D2E0D"
                     android:layout_marginBottom="50dp"
                     android:layout_marginStart="10dp">
 
@@ -66,153 +64,233 @@
                         android:fillViewport="true"
                         tools:ignore="UselessParent">
 
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                tools:ignore="ScrollViewSize">
+                        <LinearLayout
+                            android:id="@+id/strings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
 
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="15dp"
-                                    android:orientation="vertical">
+<!--                            <FrameLayout-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="match_parent">-->
 
-                                    <TextView
-                                        android:id="@+id/t"
-                                        android:layout_width="43dp"
-                                        android:layout_height="47dp"
-                                        android:layout_marginStart="19dp"
-                                        android:text="T"
-                                        android:textColor="#000"
-                                        android:textSize="45sp" />
+<!--                                <ImageView-->
+<!--                                    android:layout_width="80dp"-->
+<!--                                    android:layout_height="match_parent"-->
+<!--                                    android:src="@drawable/strings" />-->
 
-                                    <TextView
-                                        android:id="@+id/a"
-                                        android:layout_width="43dp"
-                                        android:layout_height="47dp"
-                                        android:layout_marginStart="19dp"
-                                        android:text="A"
-                                        android:textColor="#000"
-                                        android:textSize="45sp" />
+<!--                                <TextView-->
+<!--                                    android:id="@+id/lad_1_1"-->
+<!--                                    android:layout_width="30dp"-->
+<!--                                    android:layout_height="30dp"-->
+<!--                                    android:layout_marginStart="30dp"-->
+<!--                                    android:layout_marginTop="40dp"-->
+<!--                                    android:background="@drawable/rectangle_2"-->
+<!--                                    android:paddingStart="7dp"-->
+<!--                                    android:text="1"-->
+<!--                                    android:textColor="#000"-->
+<!--                                    android:textSize="20sp"-->
+<!--                                    tools:ignore="RtlSymmetry" />-->
 
-                                    <TextView
-                                        android:id="@+id/b"
-                                        android:layout_width="43dp"
-                                        android:layout_height="47dp"
-                                        android:layout_marginStart="19dp"
-                                        android:text="B"
-                                        android:textColor="#000"
-                                        android:textSize="45sp" />
-                                </LinearLayout>
+<!--                            </FrameLayout>-->
 
-                                <LinearLayout
-                                    android:id="@+id/strings"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical">
+                        </LinearLayout>
 
-                                    <FrameLayout
-                                        android:id="@+id/line_1"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="30dp"
-                                        android:scrollbars="horizontal">
+                        <!--                            <FrameLayout-->
+                        <!--                                android:layout_width="match_parent"-->
+                        <!--                                android:layout_height="match_parent"-->
+                        <!--                                tools:ignore="ScrollViewSize">-->
 
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_marginTop="15dp"
-                                            android:background="@drawable/line_1" />
+                        <!--                                <LinearLayout-->
+                        <!--                                    android:layout_width="wrap_content"-->
+                        <!--                                    android:layout_height="wrap_content"-->
+                        <!--                                    android:layout_marginTop="15dp"-->
+                        <!--                                    android:orientation="vertical">-->
 
-                                        <!--                    <TextView-->
-                                        <!--                        android:id="@+id/lad_1_1"-->
-                                        <!--                        android:layout_width="30dp"-->
-                                        <!--                        android:layout_height="30dp"-->
-                                        <!--                        android:layout_marginStart="100dp"-->
-                                        <!--                        android:background="@drawable/rectangle_2"-->
-                                        <!--                        android:paddingStart="7dp"-->
-                                        <!--                        android:text="1"-->
-                                        <!--                        android:textColor="#000"-->
-                                        <!--                        android:textSize="20sp"-->
-                                        <!--                        tools:ignore="RtlSymmetry" />-->
+                        <!--                                    <TextView-->
+                        <!--                                        android:id="@+id/t"-->
+                        <!--                                        android:layout_width="43dp"-->
+                        <!--                                        android:layout_height="47dp"-->
+                        <!--                                        android:layout_marginStart="19dp"-->
+                        <!--                                        android:text="T"-->
+                        <!--                                        android:textColor="#000"-->
+                        <!--                                        android:textSize="45sp" />-->
 
-                                    </FrameLayout>
+                        <!--                                    <TextView-->
+                        <!--                                        android:id="@+id/a"-->
+                        <!--                                        android:layout_width="43dp"-->
+                        <!--                                        android:layout_height="47dp"-->
+                        <!--                                        android:layout_marginStart="19dp"-->
+                        <!--                                        android:text="A"-->
+                        <!--                                        android:textColor="#000"-->
+                        <!--                                        android:textSize="45sp" />-->
+
+                        <!--                                    <TextView-->
+                        <!--                                        android:id="@+id/b"-->
+                        <!--                                        android:layout_width="43dp"-->
+                        <!--                                        android:layout_height="47dp"-->
+                        <!--                                        android:layout_marginStart="19dp"-->
+                        <!--                                        android:text="B"-->
+                        <!--                                        android:textColor="#000"-->
+                        <!--                                        android:textSize="45sp" />-->
+                        <!--                                </LinearLayout>-->
+
+                        <!--                                <LinearLayout-->
+                        <!--                                    android:id="@+id/strings"-->
+                        <!--                                    android:layout_width="match_parent"-->
+                        <!--                                    android:layout_height="wrap_content"-->
+                        <!--                                    android:orientation="vertical">-->
+
+                        <!--                                    <FrameLayout-->
+                        <!--                                        android:id="@+id/line_1"-->
+                        <!--                                        android:layout_width="match_parent"-->
+                        <!--                                        android:layout_height="30dp"-->
+                        <!--                                        android:scrollbars="horizontal">-->
+
+                        <!--                                        <View-->
+                        <!--                                            android:layout_width="match_parent"-->
+                        <!--                                            android:layout_height="1dp"-->
+                        <!--                                            android:layout_marginTop="15dp"-->
+                        <!--                                            android:background="@drawable/line_1" />-->
+
+                        <!--                                        &lt;!&ndash;                    <TextView&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:id="@+id/lad_1_1"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:layout_width="30dp"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:layout_height="30dp"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:layout_marginStart="100dp"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:background="@drawable/rectangle_2"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:paddingStart="7dp"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:text="1"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:textColor="#000"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        android:textSize="20sp"&ndash;&gt;-->
+                        <!--                                        &lt;!&ndash;                        tools:ignore="RtlSymmetry" />&ndash;&gt;-->
+
+                        <!--                                    </FrameLayout>-->
 
 
-                                    <FrameLayout
-                                        android:id="@+id/line_2"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="30dp">
+                        <!--                                    <FrameLayout-->
+                        <!--                                        android:id="@+id/line_2"-->
+                        <!--                                        android:layout_width="match_parent"-->
+                        <!--                                        android:layout_height="30dp">-->
 
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_marginTop="15dp"
-                                            android:background="@drawable/line_1" />
+                        <!--                                        <View-->
+                        <!--                                            android:layout_width="match_parent"-->
+                        <!--                                            android:layout_height="1dp"-->
+                        <!--                                            android:layout_marginTop="15dp"-->
+                        <!--                                            android:background="@drawable/line_1" />-->
 
-                                    </FrameLayout>
+                        <!--                                    </FrameLayout>-->
 
-                                    <FrameLayout
-                                        android:id="@+id/line_3"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="30dp">
+                        <!--                                    <FrameLayout-->
+                        <!--                                        android:id="@+id/line_3"-->
+                        <!--                                        android:layout_width="match_parent"-->
+                        <!--                                        android:layout_height="30dp">-->
 
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_marginTop="15dp"
-                                            android:background="@drawable/line_1" />
+                        <!--                                        <View-->
+                        <!--                                            android:layout_width="match_parent"-->
+                        <!--                                            android:layout_height="1dp"-->
+                        <!--                                            android:layout_marginTop="15dp"-->
+                        <!--                                            android:background="@drawable/line_1" />-->
 
-                                    </FrameLayout>
+                        <!--                                    </FrameLayout>-->
 
-                                    <FrameLayout
-                                        android:id="@+id/line_4"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="30dp">
+                        <!--                                    <FrameLayout-->
+                        <!--                                        android:id="@+id/line_4"-->
+                        <!--                                        android:layout_width="match_parent"-->
+                        <!--                                        android:layout_height="30dp">-->
 
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_marginTop="15dp"
-                                            android:background="@drawable/line_1" />
+                        <!--                                        <View-->
+                        <!--                                            android:layout_width="match_parent"-->
+                        <!--                                            android:layout_height="1dp"-->
+                        <!--                                            android:layout_marginTop="15dp"-->
+                        <!--                                            android:background="@drawable/line_1" />-->
 
-                                    </FrameLayout>
+                        <!--                                    </FrameLayout>-->
 
-                                    <FrameLayout
-                                        android:id="@+id/line_5"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="30dp">
+                        <!--                                    <FrameLayout-->
+                        <!--                                        android:id="@+id/line_5"-->
+                        <!--                                        android:layout_width="match_parent"-->
+                        <!--                                        android:layout_height="30dp">-->
 
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_marginTop="15dp"
-                                            android:background="@drawable/line_1" />
+                        <!--                                        <View-->
+                        <!--                                            android:layout_width="match_parent"-->
+                        <!--                                            android:layout_height="1dp"-->
+                        <!--                                            android:layout_marginTop="15dp"-->
+                        <!--                                            android:background="@drawable/line_1" />-->
 
-                                    </FrameLayout>
+                        <!--                                    </FrameLayout>-->
 
-                                    <FrameLayout
-                                        android:id="@+id/line_6"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="30dp">
+                        <!--                                    <FrameLayout-->
+                        <!--                                        android:id="@+id/line_6"-->
+                        <!--                                        android:layout_width="match_parent"-->
+                        <!--                                        android:layout_height="30dp">-->
 
-                                        <View
-                                            android:layout_width="match_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_marginTop="15dp"
-                                            android:background="@drawable/line_1" />
+                        <!--                                        <View-->
+                        <!--                                            android:layout_width="match_parent"-->
+                        <!--                                            android:layout_height="1dp"-->
+                        <!--                                            android:layout_marginTop="15dp"-->
+                        <!--                                            android:background="@drawable/line_1" />-->
 
-                                    </FrameLayout>
-                                </LinearLayout>
+                        <!--                                    </FrameLayout>-->
+                        <!--                                </LinearLayout>-->
 
-                                <View
-                                    android:id="@+id/line_left"
-                                    android:layout_width="1dp"
-                                    android:layout_height="150dp"
-                                    android:layout_marginTop="15dp"
-                                    android:background="@drawable/line_1" />
-                            </FrameLayout>
+                        <!--                                <View-->
+                        <!--                                    android:id="@+id/line_left"-->
+                        <!--                                    android:layout_width="1dp"-->
+                        <!--                                    android:layout_height="150dp"-->
+                        <!--                                    android:layout_marginTop="15dp"-->
+                        <!--                                    android:background="@drawable/line_1" />-->
+                        <!--                            </FrameLayout>-->
 
                     </HorizontalScrollView>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:background="#CB05678C">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:textColor="#FFFFFF"
+                            android:text="E"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#FFFFFF"
+                            android:text="B"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:layout_marginTop="3dp"
+                            android:textColor="#FFFFFF"
+                            android:text="G"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#FFFFFF"
+                            android:text="D"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:layout_marginTop="3dp"
+                            android:textColor="#FFFFFF"
+                            android:text="A"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:layout_marginTop="3dp"
+                            android:textColor="#FFFFFF"
+                            android:text="E"/>
+                    </LinearLayout>
                 </RelativeLayout>
 
                 <LinearLayout
@@ -226,7 +304,7 @@
                         android:id="@+id/btnPausePlay"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        app:srcCompat="@drawable/play"
+                        app:srcCompat="@drawable/no_microphone"
                         android:layout_weight="2" />
 
                     <Button

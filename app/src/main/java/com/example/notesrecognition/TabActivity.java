@@ -124,12 +124,12 @@ public class TabActivity extends AppCompatActivity implements View.OnClickListen
         frameLayouts = new FrameLayout[6];
 
         // добавляем струны
-        frameLayouts[0] = findViewById(R.id.line_1);
-        frameLayouts[1] = findViewById(R.id.line_2);
-        frameLayouts[2] = findViewById(R.id.line_3);
-        frameLayouts[3] = findViewById(R.id.line_4);
-        frameLayouts[4] = findViewById(R.id.line_5);
-        frameLayouts[5] = findViewById(R.id.line_6);
+//        frameLayouts[0] = findViewById(R.id.line_1);
+//        frameLayouts[1] = findViewById(R.id.line_2);
+//        frameLayouts[2] = findViewById(R.id.line_3);
+//        frameLayouts[3] = findViewById(R.id.line_4);
+//        frameLayouts[4] = findViewById(R.id.line_5);
+//        frameLayouts[5] = findViewById(R.id.line_6);
 
         scrollView = findViewById(R.id.horizontalScroll);
 

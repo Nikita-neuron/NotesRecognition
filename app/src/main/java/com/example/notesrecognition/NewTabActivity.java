@@ -55,6 +55,8 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
     Bitmap playImage;
     Bitmap pauseImage;
 
+    Bitmap guitarGriff;
+
     Button btnStart;
     Button btnClear;
     ImageView btnPausePlay;
@@ -67,8 +69,18 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
     HorizontalScrollView scrollView;
     TextView frequencyText;
 
+    LinearLayout strings;
+
     AudioReciever audioReciever;
     Handler handler;
+
+    int[] notesMargin = new int[] {
+            6, 110, 200, 280, 360, 450
+    };
+    // начальное количество картинок грифа
+    int countBegGriff;
+    // количество нарисованных сначало грифов
+    int countCurrGriff = 0;
 
     // ноты
     char[] notes = new char[]{'E', 'B', 'G', 'D', 'A', 'E'};
@@ -120,8 +132,10 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         frequencyText = findViewById(R.id.frequencyText);
 
         // картинки плея и паузы
-        playImage = BitmapFactory.decodeResource(getResources(), R.drawable.play);
-        pauseImage = BitmapFactory.decodeResource(getResources(), R.drawable.pause);
+        playImage = BitmapFactory.decodeResource(getResources(), R.drawable.microphone);
+        pauseImage = BitmapFactory.decodeResource(getResources(), R.drawable.no_microphone);
+
+        guitarGriff = BitmapFactory.decodeResource(getResources(), R.drawable.strings);
 
         // кнопка назад
         ActionBar actionBar =getSupportActionBar();
@@ -134,12 +148,13 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         frameLayouts = new FrameLayout[6];
 
         // добавляем струны
-        frameLayouts[0] = findViewById(R.id.line_1);
-        frameLayouts[1] = findViewById(R.id.line_2);
-        frameLayouts[2] = findViewById(R.id.line_3);
-        frameLayouts[3] = findViewById(R.id.line_4);
-        frameLayouts[4] = findViewById(R.id.line_5);
-        frameLayouts[5] = findViewById(R.id.line_6);
+//        frameLayouts[0] = findViewById(R.id.line_1);
+//        frameLayouts[1] = findViewById(R.id.line_2);
+//        frameLayouts[2] = findViewById(R.id.line_3);
+//        frameLayouts[3] = findViewById(R.id.line_4);
+//        frameLayouts[4] = findViewById(R.id.line_5);
+//        frameLayouts[5] = findViewById(R.id.line_6);
+        strings = findViewById(R.id.strings);
 
         scrollView = findViewById(R.id.horizontalScroll);
 
@@ -162,6 +177,8 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         };
 
         audioReciever = new AudioReciever(handler);
+
+        setBeginGriff();
 
 //        ArrayList <BarEntry> NoOfEmp = new ArrayList <>();
 //
@@ -214,7 +231,7 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         switch (item.getItemId()) {
             case android.R.id.home:
                 reco = false;
-                btnPausePlay.setImageBitmap(playImage);
+                btnPausePlay.setImageBitmap(pauseImage);
                 audioReciever.stop();
 
                 if (!save) {
@@ -251,12 +268,12 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
                 if (reco) {
                     // если пауза
                     reco = false;
-                    btnPausePlay.setImageBitmap(playImage);
+                    btnPausePlay.setImageBitmap(pauseImage);
                     audioReciever.stop();
                 } else {
                     // если старт
                     reco = true;
-                    btnPausePlay.setImageBitmap(pauseImage);
+                    btnPausePlay.setImageBitmap(playImage);
                     audioReciever.start();
                 }
                 break;
@@ -276,7 +293,7 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
                 if(reco) {
                     Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
                 } else {
-                    btnPausePlay.setImageBitmap(playImage);
+                    btnPausePlay.setImageBitmap(pauseImage);
                     audioReciever.stop();
                     stopRec();
                 }
@@ -295,7 +312,7 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onBackPressed() {
         reco = false;
-        btnPausePlay.setImageBitmap(playImage);
+        btnPausePlay.setImageBitmap(pauseImage);
         audioReciever.stop();
 
         if (!save) {
@@ -362,7 +379,7 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         }
         int freq = (int) 24000 * maxInd / (spectrum.length / 2);
         frequencyText.setText("Frequency: " + freq);
-        System.out.println(freq+"");
+//        System.out.println(freq+"");
 
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {
@@ -378,18 +395,6 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         return new int[] {-1, -1};
     }
 
-    private void deleteNoteViews() {
-        // удаление нот со струн
-        for (FrameLayout frameLayout : frameLayouts) {
-            int count = frameLayout.getChildCount();
-            if (count > 1) {
-                for (int j = 1; j < count; j++) {
-                    frameLayout.removeViewAt(1);
-                }
-            }
-        }
-    }
-
     @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     private void setNoteText(int[] note) {
         // note[0]  - струна
@@ -400,7 +405,7 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         // добавление ноты на струну
         // утановление margin для ноты
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(distanceNote,0,0,0);
+        params.setMargins(80, notesMargin[note[0]],0,0);
 
         textView = new TextView(this);
         textView.setBackground(getDrawable(R.drawable.rectangle_2));
@@ -408,33 +413,56 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         textView.setGravity(Gravity.CENTER);
         textView.setTextColor(Color.BLACK);
         textView.setTextSize(20);
-        textView.setPadding(0, 0, 2, 0);
+        textView.setPadding(0, 0, 4, 4);
         textView.setLayoutParams(params);
-        textView.setTag(R.id.strings, (note[0]+1) + "_" + (note[1] + 1));
+        textView.setTag((note[0]+1) + "_" + (note[1] + 1));
 
-        frameLayouts[note[0]].addView(textView);
+        if (countBegGriff != countCurrGriff) {
+            FrameLayout griff = (FrameLayout) strings.getChildAt(countCurrGriff);
+            griff.addView(textView);
+            countCurrGriff ++;
+        } else {
+            FrameLayout griff = drawGriff();
+            griff.addView(textView);
+            strings.addView(griff);
+        }
 
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(frameLayouts[note[0]].getWidth() + 60, frameLayouts[note[0]].getHeight());
-//        if (distanceNote + 30 >= width) {
-//            for (FrameLayout frameLayout : frameLayouts) {
-//                frameLayout.setLayoutParams(layoutParams);
-//            }
-//        }
-        scrollView.scrollTo(frameLayouts[note[0]].getWidth(), 0);
-        distanceNote += maxDistanceNote;
+
+        scrollView.scrollTo(strings.getWidth(), 0);
         notesFile.add(new Note(note[0], note[1]));
+    }
+
+    private FrameLayout drawGriff() {
+        FrameLayout frameLayout = new FrameLayout(this);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(203, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        ImageView imageView = new ImageView(this);
+        imageView.setImageBitmap(guitarGriff);
+        imageView.setLayoutParams(layoutParams);
+
+        frameLayout.addView(imageView);
+
+        return frameLayout;
+    }
+
+    private void setBeginGriff() {
+        countBegGriff = width / 203;
+
+        for (int i = 0; i < countBegGriff; i++) {
+            FrameLayout griff = drawGriff();
+            strings.addView(griff);
+        }
     }
 
     private void stopRec() {
         distanceNote = 150;
-        deleteNoteViews();
+        strings.removeAllViews();
         notesFile.clear();
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, frameLayouts[0].getHeight());
-        for (FrameLayout frameLayout : frameLayouts) {
-            frameLayout.setLayoutParams(layoutParams);
-        }
         scrollView.scrollTo(0, 0);
+        setBeginGriff();
+        countCurrGriff = 0;
     }
 
     private void writeFile(String name) {
