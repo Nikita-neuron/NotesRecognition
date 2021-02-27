@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "com.example.notesrecognition"
+        applicationId "com.example.tabnote"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1

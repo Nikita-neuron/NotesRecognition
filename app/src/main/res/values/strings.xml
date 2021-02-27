@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notes Recognition</string>
+    <string name="app_name">Tab Note</string>
     <string name="cardID">Card</string>
     <string name="cardFile">CardFile</string>
     <string name="cardDelete">CardDelete</string>

@@ -1,4 +1,4 @@
-package com.example.notesrecognition;
+package com.example.tabnote;
 
 import java.util.Objects;
 

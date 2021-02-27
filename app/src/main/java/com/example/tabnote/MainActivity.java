@@ -5,7 +5,7 @@
 // 2. заменить кнопку плея при записи на значок микрофона
 // 3. может быть поменять белый фон на картинку гитары
 
-package com.example.notesrecognition;
+package com.example.tabnote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
