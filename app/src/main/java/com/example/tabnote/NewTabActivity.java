@@ -1,6 +1,5 @@
 package com.example.tabnote;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -9,10 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.util.DisplayMetrics;
 import android.util.JsonWriter;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,29 +22,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class NewTabActivity extends AppCompatActivity implements View.OnClickListener{
     boolean reco = false;
@@ -68,11 +57,14 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
     TextView textView;
     HorizontalScrollView scrollView;
     TextView frequencyText;
+    Button btnPlay;
 
     LinearLayout strings;
 
     AudioReciever audioReciever;
     Handler handler;
+
+    PlayNotes playNotes;
 
     int[] notesMargin = new int[] {
             6, 110, 200, 280, 360, 450
@@ -106,9 +98,10 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
     public int width;
     public int height;
 
+    private boolean playNote = false;
+
     // массив нот
     ArrayList<Note> notesFile = new ArrayList<>();
-//    String notesFile = "";
 
     // сохранён файл или нет
     boolean save = true;
@@ -129,6 +122,8 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         btnPausePlay = findViewById(R.id.btnPausePlay);
         btnSave = findViewById(R.id.btnSaveTab);
 
+        btnPlay = findViewById(R.id.btnPlay);
+
         frequencyText = findViewById(R.id.frequencyText);
 
         // картинки плея и паузы
@@ -142,18 +137,9 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-//        chart = findViewById(R.id.barchart);
-
         // массив струн
         frameLayouts = new FrameLayout[6];
 
-        // добавляем струны
-//        frameLayouts[0] = findViewById(R.id.line_1);
-//        frameLayouts[1] = findViewById(R.id.line_2);
-//        frameLayouts[2] = findViewById(R.id.line_3);
-//        frameLayouts[3] = findViewById(R.id.line_4);
-//        frameLayouts[4] = findViewById(R.id.line_5);
-//        frameLayouts[5] = findViewById(R.id.line_6);
         strings = findViewById(R.id.strings);
 
         scrollView = findViewById(R.id.horizontalScroll);
@@ -161,11 +147,12 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         btnPausePlay.setOnClickListener(this);
         btnSave.setOnClickListener(this);
         btnClear.setOnClickListener(this);
+        btnPlay.setOnClickListener(this);
 
         handler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 // получаем ноту по частоте, переданной из детектора
-                double[] spectrum = (double[]) msg.obj;
+                LinkedHashMap<Integer, Integer> spectrum = (LinkedHashMap<Integer, Integer>) msg.obj;
 
                 int[] note = getNote(spectrum);
 
@@ -179,55 +166,11 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         audioReciever = new AudioReciever(handler);
 
         setBeginGriff();
-
-//        ArrayList <BarEntry> NoOfEmp = new ArrayList <>();
-//
-//        NoOfEmp.add(new BarEntry(945f, 0));
-//        NoOfEmp.add(new BarEntry(1040f, 1));
-//        NoOfEmp.add(new BarEntry(1133f, 2));
-//        NoOfEmp.add(new BarEntry(1240f, 3));
-//        NoOfEmp.add(new BarEntry(1369f, 4));
-//        NoOfEmp.add(new BarEntry(1487f, 5));
-//        NoOfEmp.add(new BarEntry(1501f, 6));
-//        NoOfEmp.add(new BarEntry(1645f, 7));
-//        NoOfEmp.add(new BarEntry(1578f, 8));
-//        NoOfEmp.add(new BarEntry(1695f, 9));
-
-//        ArrayList<String> year = new ArrayList<>();
-//        String[] year = new String[NoOfEmp.size()];
-//
-//        year[0] = "2008";
-//        year[0] = "2009";
-//        year[0] = "2010";
-//        year[0] = "2011";
-//        year[0] = "2012";
-//        year[0] = "2013";
-//        year[0] = "2014";
-//        year[0] = "2015";
-//        year[0] = "2016";
-//        year[0] = "2017";
-
-//        year.add("2008");
-//        year.add("2009");
-//        year.add("2010");
-//        year.add("2011");
-//        year.add("2012");
-//        year.add("2013");
-//        year.add("2014");
-//        year.add("2015");
-//        year.add("2016");
-//        year.add("2017");
-
-//        BarDataSet bardataset = new BarDataSet(NoOfEmp, "No Of Employee");
-//        bardataset.setStackLabels(year);
-////        chart.animateY(5000);
-//        BarData data = new BarData(bardataset);
-//        bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
-//        chart.setData(data);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // стрелочка назад в верхнем меню
         switch (item.getItemId()) {
             case android.R.id.home:
                 reco = false;
@@ -248,65 +191,69 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-//        if (v.getId() == R.id.btnStart) {
-//            reco = true;
-//            audioReciever.start();
-//        }
-//        if (v.getId() == R.id.btnPause) {
-//            reco = false;
-//            audioReciever.stop();
-//        }
-//        if (v.getId() == R.id.btnStop) {
-//            reco = false;
-//            audioReciever.stop();
-//            stopRec();
-//        }
-
         switch (v.getId()) {
             case (R.id.btnPausePlay): {
                 // при нажатии на кнопку старт или пауза
-                if (reco) {
-                    // если пауза
-                    reco = false;
-                    btnPausePlay.setImageBitmap(pauseImage);
-                    audioReciever.stop();
+                if (!playNote) {
+                    if (reco) {
+                        // если пауза
+                        reco = false;
+                        btnPausePlay.setImageBitmap(pauseImage);
+                        audioReciever.stop();
+                    } else {
+                        // если старт
+                        reco = true;
+                        btnPausePlay.setImageBitmap(playImage);
+                        audioReciever.start();
+                    }
                 } else {
-                    // если старт
-                    reco = true;
-                    btnPausePlay.setImageBitmap(playImage);
-                    audioReciever.start();
+                    Toast.makeText(this, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
                 }
                 break;
             }
 
             case (R.id.btnSaveTab): {
                 // при нажатии на сохранить
-                if(reco) {
-                    Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
+                if (!playNote) {
+                    if (reco) {
+                        Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
+                    } else {
+                        createDialog("writeFile", "");
+                    }
                 } else {
-                    createDialog("writeFile", "");
+                    Toast.makeText(this, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
                 }
                 break;
             }
 
             case (R.id.btnClear): {
-                if(reco) {
-                    Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
+                if (!playNote) {
+                    if (reco) {
+                        Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
+                    } else {
+                        btnPausePlay.setImageBitmap(pauseImage);
+                        audioReciever.stop();
+                        stopRec();
+                    }
                 } else {
-                    btnPausePlay.setImageBitmap(pauseImage);
-                    audioReciever.stop();
-                    stopRec();
+                    Toast.makeText(this, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+
+            case (R.id.btnPlay): {
+                if (!playNote) {
+                    if (reco) {
+                        Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
+                    } else {
+                        playNote();
+                    }
+                } else {
+                    playNotes.pause();
                 }
                 break;
             }
         }
-//        if (v.getId() == R.id.btnOpenTab) {
-//            if(reco) {
-//                Toast.makeText(this, "Остановите запись", Toast.LENGTH_LONG).show();
-//            } else {
-//                createDialog("readFile", "");
-//            }
-//        }
     }
 
     @Override
@@ -323,46 +270,11 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private int[] getNote(double[] spectrum) {
+    private int[] getNote(LinkedHashMap<Integer, Integer> spectrum) {
         // получение ноты
 
-//        Runnable runnable = () -> {
-//            String data = "\n";
-//            float f = 2f;
-//            ArrayList <BarEntry> entries = new ArrayList <>();
-//
-//            for(double v : spectrum) {
-////            Log.d("d", v+"");
-//                entries.add(new BarEntry(f, (float) v));
-//                data += String.valueOf(v);
-//                data += "\n";
-//                f += 2f;
-//            }
-//
-//            BarDataSet bardataset = new BarDataSet(entries, "No Of Employee");
-//            BarData barData = new BarData(bardataset);
-//            bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
-////
-//            chart.post(() -> chart.setData(barData));
-//
-////        writeFile(data);
-//        };
-//        Thread thread = new Thread(runnable);
-//        thread.start();
-//        Runnable runnable = () -> {
-//            String data = "\n";
-//            for(double v : spectrum) {
-//                data += String.valueOf(v);
-//                data += "\n";
-//            }
-////            Log.d("d", data);
-//            writeFile(data);
-//        };
-//        Thread thread = new Thread(runnable);
-//        thread.start();
-//        runOnUiThread(runnable);
-
         /* find the peak magnitude and it's index */
+        /*
         double maxMag = Double.NEGATIVE_INFINITY;
         int maxInd = -1;
         for (int i = 0; i < spectrum.length / 2; ++i) {
@@ -381,6 +293,14 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         frequencyText.setText("Frequency: " + freq);
 //        System.out.println(freq+"");
 
+         */
+
+        double freq = 0;
+//        freq = getMaxIndex(spectrum) *24000 / spectrum.size();
+        freq = getMaxIndex(spectrum);
+
+        System.out.println("result freq: " + freq);
+
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {
                 // если частота совпадает с погрешностью, то возвращаем
@@ -391,8 +311,42 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
         }
+//        return (int) Math.round(f);
+//        return (int) f;
         // если не совпадает, то возвращаем -1
         return new int[] {-1, -1};
+    }
+
+    public double getMaxIndex(LinkedHashMap spectrum) {
+        double fr = 0;
+        double maxx = 0;
+
+        Set set = spectrum.entrySet();
+        for (Object o : set) {
+            Map.Entry item = (Map.Entry) o;
+            int freq = (int) item.getKey();
+            int val = (int) item.getValue();
+
+            if (val > maxx){
+                maxx = val;
+                fr = freq;
+            }
+        }
+        return fr;
+    }
+
+    private void playNote() {
+        playNotes = new PlayNotes(this, notesFile, strings);
+
+        playNote = true;
+
+        playNotes.start();
+
+        new Thread(() ->{
+            while (playNote) {
+                playNote = playNotes.endPlay;
+            }
+        }).start();
     }
 
     @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
@@ -405,6 +359,12 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         // добавление ноты на струну
         // утановление margin для ноты
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutPlayParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setLayoutParams(layoutPlayParams);
+        linearLayout.setBackgroundColor(Color.argb(0, 106, 161, 71));
+
         params.setMargins(80, notesMargin[note[0]],0,0);
 
         textView = new TextView(this);
@@ -420,26 +380,30 @@ public class NewTabActivity extends AppCompatActivity implements View.OnClickLis
         if (countBegGriff != countCurrGriff) {
             FrameLayout griff = (FrameLayout) strings.getChildAt(countCurrGriff);
             griff.addView(textView);
+            griff.addView(linearLayout);
             countCurrGriff ++;
         } else {
             FrameLayout griff = drawGriff();
             griff.addView(textView);
+            griff.addView(linearLayout);
             strings.addView(griff);
         }
 
 
         scrollView.scrollTo(strings.getWidth(), 0);
         notesFile.add(new Note(note[0], note[1]));
+
+        
     }
 
     private FrameLayout drawGriff() {
         FrameLayout frameLayout = new FrameLayout(this);
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(203, LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams layoutImageParams = new LinearLayout.LayoutParams(203, LinearLayout.LayoutParams.MATCH_PARENT);
 
         ImageView imageView = new ImageView(this);
         imageView.setImageBitmap(guitarGriff);
-        imageView.setLayoutParams(layoutParams);
+        imageView.setLayoutParams(layoutImageParams);
 
         frameLayout.addView(imageView);
 

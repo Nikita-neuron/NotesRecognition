@@ -1,20 +1,6 @@
 package com.example.tabnote;
 
-import android.util.Log;
-
 import org.jtransforms.dct.DoubleDCT_1D;
-import org.jtransforms.fft.DoubleFFT_1D;
-
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-
-import jwave.*;
-import jwave.transforms.AncientEgyptianDecomposition;
-import jwave.transforms.DiscreteFourierTransform;
-import jwave.transforms.FastWaveletTransform;
-import jwave.transforms.wavelets.haar.Haar1;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class FrequencyScanner {
     private double[] window;
@@ -148,16 +134,16 @@ public class FrequencyScanner {
 
 
 
-    public static Complex[] decimationInFrequency(Complex[] frame, boolean direct)
+    public static Complex_1[] decimationInFrequency(Complex_1[] frame, boolean direct)
     {
         if (frame.length == 1) return frame;
         double halfSampleSize = frame.length / 2; // frame.Length/2
         int fullSampleSize = frame.length;
 
         double arg = direct ? -Math.PI/fullSampleSize : Math.PI/fullSampleSize;
-        Complex omegaPowBase = new Complex(Math.cos(arg), Math.sin(arg));
-        Complex omega = new Complex(1, 0);
-        Complex[] spectrum = new Complex[fullSampleSize];
+        Complex_1 omegaPowBase = new Complex_1(Math.cos(arg), Math.sin(arg));
+        Complex_1 omega = new Complex_1(1, 0);
+        Complex_1[] spectrum = new Complex_1[fullSampleSize];
 
         for (int j = 0; j < halfSampleSize; j++)
         {
@@ -166,8 +152,8 @@ public class FrequencyScanner {
             omega.times(omegaPowBase);
         }
 
-        Complex[] yTop = new Complex[(int) halfSampleSize];
-        Complex[] yBottom = new Complex[(int) halfSampleSize];
+        Complex_1[] yTop = new Complex_1[(int) halfSampleSize];
+        Complex_1[] yBottom = new Complex_1[(int) halfSampleSize];
         for (int i = 0; i < halfSampleSize; i++)
         {
             yTop[i] = spectrum[i];

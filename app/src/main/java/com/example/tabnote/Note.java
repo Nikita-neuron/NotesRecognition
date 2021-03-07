@@ -8,4 +8,9 @@ public class Note {
         this.string = string;
         this.fret = fret;
     }
+
+    @Override
+    public String toString() {
+        return (string + 1) + "_" + fret;
+    }
 }

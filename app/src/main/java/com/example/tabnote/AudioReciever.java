@@ -6,11 +6,16 @@ import android.media.MediaRecorder;
 import android.os.Handler;
 import android.util.Log;
 
+import java.util.LinkedHashMap;
+
 public class AudioReciever{
     private final int freq = 24000;
     private AudioRecord audioRecord;
     private Thread Rthread;
     private final Handler handler;
+
+    private Complex complex;
+    private FFTAnother fftAnother;
 
     private boolean running = false;
 
@@ -43,13 +48,44 @@ public class AudioReciever{
                 MediaRecorder.AudioEncoder.AMR_NB, bufferSize);
 
         final short[] buffer = new short[bufferSize];
+        final short[] buffer2 = new short[bufferSize];
+
+        complex = new Complex();
+        fftAnother = new FFTAnother();
+
         audioRecord.startRecording();
         Rthread = new Thread(() -> {
             while (running) {
                 try {
-                    int data = audioRecord.read(buffer, 0, bufferSize);
-
+                    audioRecord.read(buffer, 0, bufferSize);
                     double[] res = frequencyScanner.extractFrequency(buffer, freq);
+
+                    Thread.sleep(100);
+
+                    audioRecord.read(buffer2, 0, bufferSize);
+                    double[] res2 = frequencyScanner.extractFrequency(buffer2, freq);
+
+                    for (int i = 0; i < res.length; i++) {
+                        res[i] /= bufferSize;
+                        res2[i] /= bufferSize;
+                    }
+//                    System.out.println("res: " + res[0] + " " + res[1]);
+//                    System.out.println("res2: " + res2[0] + " " + res2[1]);
+
+                    Complex[] buffer_complex = complex.realToComplex(buffer);
+                    Complex[] buffer_complex2 = complex.realToComplex(buffer2);
+
+                    Complex[] res_complex = fftAnother.DecimationInTime(buffer_complex, true, true);
+                    Complex[] res_complex2 = fftAnother.DecimationInTime(buffer_complex2, true, true);
+
+                    for (int i = 0; i < res_complex.length; i++) {
+                        res_complex[i].re /= bufferSize;
+                        res_complex2[i].re /= bufferSize;
+                    }
+
+                    LinkedHashMap<Integer, Integer> spectrum = Filters.GetJoinedSpectrum(res_complex, res_complex2, 16, freq);
+//                    System.out.println("spectrum: " + spectrum.toString());
+
                     String data1 = "\n";
 //                    for(int i = 0; i < res.length / 2; i++) {
 //                        Log.d("d", i+"");
@@ -59,7 +95,7 @@ public class AudioReciever{
 //                    }
 //                    Log.d("d", "-------");
 //                    Log.d("d", data1);
-                    handler.sendMessage(handler.obtainMessage(2, res));
+                    handler.sendMessage(handler.obtainMessage(2, spectrum));
 //                    Log.d("data", res+"");
 
                 } catch (Throwable t) {
