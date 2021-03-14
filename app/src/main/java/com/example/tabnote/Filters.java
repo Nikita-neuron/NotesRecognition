@@ -104,8 +104,8 @@ public class Filters {
             double c = (v1 - v0)/(u1 - u0);
             double d = v0 - c*u0;
 
-            double x = (d - b)/(a - c);
-            double y = (a*d - b*c)/(a - c);
+            int x = (int) ((d - b)/(a - c));
+            int y = (int) ((a*d - b*c)/(a - c));
 
             if (y > y0 && y > y1 && y > v0 && y > v1 &&
                     x > x0 && x > x1 && x < u0 && x < u1)

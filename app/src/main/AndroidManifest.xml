@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".TabActivity"
+        <activity android:name=".TabSavedActivity"
             android:screenOrientation="landscape">
 
         </activity>

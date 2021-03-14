@@ -12,11 +12,9 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -160,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (v.getTag(R.string.cardID) != null && v.getTag(R.string.cardID).equals("card")) {
             // при нажатии на кнопку новой табулатуры
-            Intent in = new Intent(this, TabActivity.class);
+            Intent in = new Intent(this, TabSavedActivity.class);
             in.putExtra("file", v.getTag(R.string.cardFile)+"");
             startActivity(in);
         }

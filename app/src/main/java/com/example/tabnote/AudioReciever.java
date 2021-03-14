@@ -60,7 +60,7 @@ public class AudioReciever{
                     audioRecord.read(buffer, 0, bufferSize);
                     double[] res = frequencyScanner.extractFrequency(buffer, freq);
 
-                    Thread.sleep(100);
+                    Thread.sleep(30);
 
                     audioRecord.read(buffer2, 0, bufferSize);
                     double[] res2 = frequencyScanner.extractFrequency(buffer2, freq);
@@ -84,6 +84,7 @@ public class AudioReciever{
                     }
 
                     LinkedHashMap<Integer, Integer> spectrum = Filters.GetJoinedSpectrum(res_complex, res_complex2, 16, freq);
+                    spectrum = Filters.Antialiasing(spectrum);
 //                    System.out.println("spectrum: " + spectrum.toString());
 
                     String data1 = "\n";

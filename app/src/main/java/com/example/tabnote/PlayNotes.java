@@ -20,7 +20,7 @@ public class PlayNotes {
 
     private ArrayList<Note> notes;
 
-    public boolean endPlay = true;
+    public boolean playNote = false;
 
     private LinearLayout strings;
     private FrameLayout stringCurrent;
@@ -37,29 +37,44 @@ public class PlayNotes {
         mediaPlayer.setOnCompletionListener(mp -> {
             mediaPlayer.stop();
             if (currentIndexNote == notes.size() - 1) {
-                endPlay = true;
+                stop();
             }
             else {
                 currentIndexNote ++;
             }
-            initPlay();
+
+            if (playNote) {
+                initPlay();
+                play();
+            }
         });
+
+//        mediaPlayer.setOnPreparedListener(mp -> mediaPlayer.start());
     }
 
     public void start() {
-        endPlay = false;
-
+        playNote = true;
         initPlay();
+    }
+    public void play() {
+        playNote = true;
+        playNote();
     }
     public void pause() {
         mediaPlayer.pause();
-//        endPlay = true;
+        playNote = false;
+    }
+
+    public void setNotes(ArrayList<Note> notes, LinearLayout strings) {
+        this.notes = notes;
+        this.strings = strings;
     }
 
     public  void stop() {
-        endPlay = true;
+        playNote = false;
 
         mediaPlayer.stop();
+        mediaPlayer.release();
 
         stringCurrent.getChildAt(2).setBackgroundColor(Color.argb(0, 106, 161, 71));
 
@@ -67,46 +82,43 @@ public class PlayNotes {
         currentIndexNote = 0;
     }
 
-    private void initPlay() {
+    public void initPlay() {
+        stringCurrent = (FrameLayout) this.strings.getChildAt(currentIndexNote);
         stringCurrent.getChildAt(2).setBackgroundColor(Color.argb(0, 106, 161, 71));
 
-        if (!endPlay) {
+        Note currentNote = notes.get(currentIndexNote);
+        String fileName = "str_" + currentNote;
 
-            Note currentNote = notes.get(currentIndexNote);
-            String fileName = "str_" + currentNote;
+        boolean f = true;
 
-            boolean f = true;
+        String[] files = new String[] {"str_1_0", "str_2_0"};
 
-            String[] files = new String[] {"str_1_0", "str_2_0"};
-
-            for (String name : files) {
-                if (name.equals(fileName)) {
-                    f = false;
-                    break;
-                }
+        for (String name : files) {
+            if (name.equals(fileName)) {
+                f = false;
+                break;
             }
+        }
 
-            if (f) {
-                fileName = "str_1_0";
-            }
+        if (f) {
+            fileName = "str_1_0";
+        }
 
-            String res = "android.resource://" + context.getPackageName() + "/raw/" + fileName;
+        String res = "android.resource://" + context.getPackageName() + "/raw/" + fileName;
 
-            Uri url = Uri.parse(res);
+        Uri url = Uri.parse(res);
 
-            try {
-                mediaPlayer.reset();
-                mediaPlayer.setDataSource(context, url);
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mediaPlayer.prepare();
-                play();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(context, url);
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private void play() {
+    private void playNote() {
         mediaPlayer.start();
 
         System.out.println("Play: true");
