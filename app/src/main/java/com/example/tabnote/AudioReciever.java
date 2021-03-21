@@ -30,8 +30,9 @@ public class AudioReciever{
         loopback();
     }
 
-    protected  void stop() {
+    protected  void stop() throws InterruptedException {
         running = false;
+        Rthread.join();
     }
 
     protected void loopback() {
@@ -60,7 +61,7 @@ public class AudioReciever{
                     audioRecord.read(buffer, 0, bufferSize);
                     double[] res = frequencyScanner.extractFrequency(buffer, freq);
 
-                    Thread.sleep(30);
+                    Thread.sleep(10);
 
                     audioRecord.read(buffer2, 0, bufferSize);
                     double[] res2 = frequencyScanner.extractFrequency(buffer2, freq);

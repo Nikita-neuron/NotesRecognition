@@ -155,7 +155,11 @@ public class TabSavedActivity extends AppCompatActivity{
             case android.R.id.home:
                 tabRec.reco = false;
                 btnPausePlay.setImageBitmap(pauseImage);
-                tabRec.audioReciever.stop();
+                try {
+                    tabRec.audioReciever.stop();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 if (!save) {
                     tabRec.createDialog("back", "");
@@ -173,7 +177,11 @@ public class TabSavedActivity extends AppCompatActivity{
     public void onBackPressed() {
         tabRec.reco = false;
         btnPausePlay.setImageBitmap(pauseImage);
-        tabRec.audioReciever.stop();
+        try {
+            tabRec.audioReciever.stop();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         if (!save) {
             tabRec.createDialog("back", "");

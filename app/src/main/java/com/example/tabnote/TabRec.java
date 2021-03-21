@@ -182,7 +182,11 @@ public class TabRec implements View.OnClickListener{
                         // если пауза
                         reco = false;
                         btnPausePlay.setImageBitmap(pauseImage);
-                        audioReciever.stop();
+                        try {
+                            audioReciever.stop();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         // если старт
                         reco = true;
@@ -215,7 +219,11 @@ public class TabRec implements View.OnClickListener{
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
                     } else {
                         btnPausePlay.setImageBitmap(pauseImage);
-                        audioReciever.stop();
+                        try {
+                            audioReciever.stop();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         stopRec();
                     }
                 } else {
@@ -269,6 +277,11 @@ public class TabRec implements View.OnClickListener{
 //        freq = getMaxIndex(spectrum) *24000 / spectrum.size();
         freq = getMaxIndex(spectrum);
         frequencyText.setText("Frequency: " + freq);
+        // входной порог в буфер почистить его
+        // эквалайзер
+        // поиграться со временем между буферами (10)
+        // скрипка
+        // посчитать частоты по формуле
 
         System.out.println("result freq: " + freq);
 
@@ -277,8 +290,19 @@ public class TabRec implements View.OnClickListener{
                 // если частота совпадает с погрешностью, то возвращаем
                 // i - струна
                 // j - лад
+                double crat = freq / frequency[i][j];
+                double crat_freq = freq / crat;
+                System.out.println("crat: " + crat);
                 if(freq >= frequency[i][j] - er && freq <= frequency[i][j] + er) {
-                    return new int[] {i, j};
+                    return new int[]{i, j};
+                }
+                else {
+                    for (int k = 2; k <= 10; k++) {
+                        if (freq / k == frequency[i][j]) {
+                            System.out.println("crat_freq: " + crat_freq);
+                            return new int[] {i, j};
+                        }
+                    }
                 }
             }
         }
