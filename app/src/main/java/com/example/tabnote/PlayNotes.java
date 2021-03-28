@@ -35,6 +35,7 @@ public class PlayNotes {
         stringCurrent = (FrameLayout) this.strings.getChildAt(currentIndexNote);
 
         mediaPlayer.setOnCompletionListener(mp -> {
+            stringCurrent.getChildAt(2).setBackgroundColor(Color.argb(0, 106, 161, 71));
             mediaPlayer.stop();
             if (currentIndexNote == notes.size() - 1) {
                 stop();
@@ -42,20 +43,13 @@ public class PlayNotes {
             else {
                 currentIndexNote ++;
             }
-
             if (playNote) {
                 initPlay();
                 play();
             }
         });
-
-//        mediaPlayer.setOnPreparedListener(mp -> mediaPlayer.start());
     }
 
-    public void start() {
-        playNote = true;
-        initPlay();
-    }
     public void play() {
         playNote = true;
         playNote();
@@ -70,27 +64,22 @@ public class PlayNotes {
         this.strings = strings;
     }
 
-    public  void stop() {
+    public void stop() {
         playNote = false;
 
         mediaPlayer.stop();
-        mediaPlayer.release();
-
         stringCurrent.getChildAt(2).setBackgroundColor(Color.argb(0, 106, 161, 71));
 
-        stringCurrent = (FrameLayout) this.strings.getChildAt(currentIndexNote);
+        stringCurrent = (FrameLayout) strings.getChildAt(currentIndexNote);
         currentIndexNote = 0;
     }
 
     public void initPlay() {
-        stringCurrent = (FrameLayout) this.strings.getChildAt(currentIndexNote);
-        stringCurrent.getChildAt(2).setBackgroundColor(Color.argb(0, 106, 161, 71));
-
+        stringCurrent = (FrameLayout) strings.getChildAt(currentIndexNote);
         Note currentNote = notes.get(currentIndexNote);
         String fileName = "str_" + currentNote;
 
         boolean f = true;
-
         String[] files = new String[] {"str_1_0", "str_2_0"};
 
         for (String name : files) {
@@ -99,13 +88,10 @@ public class PlayNotes {
                 break;
             }
         }
-
         if (f) {
             fileName = "str_1_0";
         }
-
         String res = "android.resource://" + context.getPackageName() + "/raw/" + fileName;
-
         Uri url = Uri.parse(res);
 
         try {

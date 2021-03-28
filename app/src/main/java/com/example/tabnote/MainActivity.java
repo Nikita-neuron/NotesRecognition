@@ -11,6 +11,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -26,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -38,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     TextView textViewCards;
 
+    DBManager dbManager;
+
     // массив карточек
     ArrayList<TabCardView> cardsView = new ArrayList<>();
 
@@ -46,6 +52,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActionBar actionBar;
+        actionBar = getSupportActionBar();
+        @SuppressLint("ResourceAsColor")
+        ColorDrawable colorDrawable
+                = new ColorDrawable(R.color.topMenuColor);
+        assert actionBar != null;
+        actionBar.setBackgroundDrawable(colorDrawable);
+
+        dbManager = DBManager.getInstance(this);
 
         // проверка разрешений
         // запись с микрофона
@@ -72,22 +88,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createTab.setOnClickListener(this);
 
         // все файлы в папке
-        String[] files = fileList();
+        ArrayList<String> tabNames = dbManager.getTabNames();
 
         textViewCards = findViewById(R.id.noTabs);
 
-        if (files.length == 0) {
+        if (tabNames.size() == 0) {
             textViewCards.setText("У вас нет сохранённых табулатур");
         } else {
             textViewCards.setText("Сохранённые табулатуры");
             // создание карточек с табулатурами
             int i = 0;
-            for(String file: files) {
-                String fileName = file.split("\\.")[0];
+            for(String tabName: tabNames) {
 
-                TabCardView cardView = new TabCardView(this, fileName);
+                TabCardView cardView = new TabCardView(this, tabName);
                 cardView.setTag(R.string.cardID, "card");
-                cardView.setTag(R.string.cardFile, file);
+                cardView.setTag(R.string.cardFile, tabName);
                 cardView.setOnClickListener(this);
 
                 cardView.cardDeleteTab.setTag(R.string.cardDelete, "delete");
@@ -148,7 +163,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // удаление карточки
             cardsView.remove(card);
             tabCards.removeView(card);
-            this.deleteFile((String) card.getTag(R.string.cardFile));
+            String tabName = (String) card.getTag(R.string.cardFile);
+            dbManager.deleteTab(tabName);
 
             Toast.makeText(this, "Файл удалён", Toast.LENGTH_LONG).show();
 

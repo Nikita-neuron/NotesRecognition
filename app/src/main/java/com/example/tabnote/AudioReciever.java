@@ -66,18 +66,23 @@ public class AudioReciever{
                     audioRecord.read(buffer2, 0, bufferSize);
                     double[] res2 = frequencyScanner.extractFrequency(buffer2, freq);
 
-                    for (int i = 0; i < res.length; i++) {
-                        res[i] /= bufferSize;
-                        res2[i] /= bufferSize;
-                    }
+//                    for (int i = 0; i < res.length; i++) {
+//                        res[i] /= bufferSize;
+//                        res2[i] /= bufferSize;
+//                    }
 //                    System.out.println("res: " + res[0] + " " + res[1]);
 //                    System.out.println("res2: " + res2[0] + " " + res2[1]);
+
+                    for (int i = 0; i < bufferSize; i++) {
+                        buffer[i] *= frequencyScanner.Gausse(i, bufferSize);
+                        buffer2[i] *= frequencyScanner.Gausse(i, bufferSize);
+                    }
 
                     Complex[] buffer_complex = complex.realToComplex(buffer);
                     Complex[] buffer_complex2 = complex.realToComplex(buffer2);
 
-                    Complex[] res_complex = fftAnother.DecimationInTime(buffer_complex, true, true);
-                    Complex[] res_complex2 = fftAnother.DecimationInTime(buffer_complex2, true, true);
+                    Complex[] res_complex = fftAnother.DecimationInFrequency(buffer_complex, false);
+                    Complex[] res_complex2 = fftAnother.DecimationInFrequency(buffer_complex2, false);
 
                     for (int i = 0; i < res_complex.length; i++) {
                         res_complex[i].re /= bufferSize;
@@ -98,6 +103,7 @@ public class AudioReciever{
 //                    Log.d("d", "-------");
 //                    Log.d("d", data1);
                     handler.sendMessage(handler.obtainMessage(2, spectrum));
+//                    handler.sendMessage(handler.obtainMessage(2, res));
 //                    Log.d("data", res+"");
 
                 } catch (Throwable t) {

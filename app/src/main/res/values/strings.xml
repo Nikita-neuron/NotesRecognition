@@ -4,4 +4,9 @@
     <string name="cardFile">CardFile</string>
     <string name="cardDelete">CardDelete</string>
     <string name="cardDeleteID">CardDeleteID</string>
+    <string name="noteType">noteType</string>
+    <string name="noteTypeStandard">Standard</string>
+    <string name="noteTypeUpdate">Update</string>
+    <string name="noteValue">value</string>
+    <string name="noteID">noteID</string>
 </resources>

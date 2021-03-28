@@ -7,12 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.JsonWriter;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,21 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
-
-import com.github.mikephil.charting.charts.BarChart;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,16 +34,10 @@ public class TabRec implements View.OnClickListener{
 
     Bitmap playImage;
     Bitmap pauseImage;
-
     Bitmap guitarGriff;
-
-    Button btnStart;
     Button btnClear;
     ImageView btnPausePlay;
-    ImageView arrowBack;
     ImageView btnSave;
-    Button btnOpenTab;
-    BarChart chart;
     FrameLayout[] frameLayouts;
     TextView textView;
     HorizontalScrollView scrollView;
@@ -72,7 +52,7 @@ public class TabRec implements View.OnClickListener{
     PlayNotes playNotes;
 
     int[] notesMargin = new int[] {
-            6, 110, 200, 280, 360, 450
+            40, 120, 220, 300, 380, 470
     };
     // начальное количество картинок грифа
     int countBegGriff;
@@ -114,10 +94,14 @@ public class TabRec implements View.OnClickListener{
 
     Context context;
 
+    DBManager dbManager;
+
     @SuppressLint("HandlerLeak")
     public TabRec(Context context, View btnClear, View btnPausePlay, View btnSave, View btnPlay,
                   View frequencyText, View strings, View scrollView) {
         this.context = context;
+
+        dbManager = DBManager.getInstance(context);
 
         // размеры экрана
         DisplayMetrics displaymetrics = context.getResources().getDisplayMetrics();
@@ -155,12 +139,13 @@ public class TabRec implements View.OnClickListener{
             public void handleMessage(android.os.Message msg) {
                 // получаем ноту по частоте, переданной из детектора
                 LinkedHashMap<Integer, Integer> spectrum = (LinkedHashMap<Integer, Integer>) msg.obj;
+//                double[] spectrum = (double[]) msg.obj;
 
                 int[] note = getNote(spectrum);
 
                 // если распознано, то добавляем на струну
                 if(note[0] >= 0 && note[1] >= 0) {
-                    setNoteText(note);
+                    setNoteText(note, "standard", null, 0);
                 }
             };
         };
@@ -170,10 +155,25 @@ public class TabRec implements View.OnClickListener{
         playNotes = new PlayNotes(context, notesFile, this.strings);
 
         setBeginGriff();
+
+//        for (int i = 0; i < 6; i++) {
+//            setNoteText(new int[] {i, 0}, "standard", null, 0);
+//        }
     }
 
     @Override
     public void onClick(View v) {
+        if (v.getTag(R.string.noteValue) != null) {
+            System.out.println(v.getTag(R.string.noteType));
+            String type = String.valueOf(v.getTag(R.string.noteType));
+            System.out.println(type);
+            if (type.equals(R.string.noteTypeStandard)) {
+                updateNoteText(v);
+            }
+            else if (type.equals(R.string.noteTypeUpdate)) {
+
+            }
+        }
         switch (v.getId()) {
             case (R.id.btnPausePlay): {
                 // при нажатии на кнопку старт или пауза
@@ -214,6 +214,7 @@ public class TabRec implements View.OnClickListener{
             }
 
             case (R.id.btnClear): {
+                // если нажата кнопка очистки
                 if (!playNote) {
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
@@ -233,7 +234,7 @@ public class TabRec implements View.OnClickListener{
             }
 
             case (R.id.btnPlay): {
-                System.out.println("playNote: " + playNote);
+                // если нажата кнопка воспроизведения
                 if (!playNote) {
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
@@ -249,6 +250,7 @@ public class TabRec implements View.OnClickListener{
     }
 
     private int[] getNote(LinkedHashMap<Integer, Integer> spectrum) {
+//    private int[] getNote(double[] spectrum) {
         // получение ноты
 
         /* find the peak magnitude and it's index */
@@ -270,8 +272,8 @@ public class TabRec implements View.OnClickListener{
         int freq = (int) 24000 * maxInd / (spectrum.length / 2);
         frequencyText.setText("Frequency: " + freq);
 //        System.out.println(freq+"");
+        */
 
-         */
 
         double freq = 0;
 //        freq = getMaxIndex(spectrum) *24000 / spectrum.size();
@@ -308,6 +310,7 @@ public class TabRec implements View.OnClickListener{
         }
 //        return (int) Math.round(f);
 //        return (int) f;
+
         // если не совпадает, то возвращаем -1
         return new int[] {-1, -1};
     }
@@ -346,7 +349,7 @@ public class TabRec implements View.OnClickListener{
     }
 
     @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
-    private void setNoteText(int[] note) {
+    private void setNoteText(int[] note, String type, FrameLayout parent, int noteIndex) {
         // note[0]  - струна
         // note[1] - лад
 
@@ -364,29 +367,55 @@ public class TabRec implements View.OnClickListener{
         params.setMargins(80, notesMargin[note[0]],0,0);
 
         textView = new TextView(context);
-        textView.setBackground(context.getDrawable(R.drawable.rectangle_2));
         textView.setText(note[1]+"");
         textView.setGravity(Gravity.CENTER);
         textView.setTextColor(Color.BLACK);
         textView.setTextSize(20);
         textView.setPadding(0, 0, 4, 4);
         textView.setLayoutParams(params);
-        textView.setTag((note[0]+1) + "_" + (note[1] + 1));
+        textView.setTag(R.string.noteValue, (note[0]) + "_" + (note[1]));
 
-        if (countBegGriff != countCurrGriff) {
-            FrameLayout griff = (FrameLayout) strings.getChildAt(countCurrGriff);
-            griff.addView(textView);
-            griff.addView(linearLayout);
-            countCurrGriff ++;
-        } else {
-            FrameLayout griff = drawGriff();
-            griff.addView(textView);
-            griff.addView(linearLayout);
-            strings.addView(griff);
+        switch (type) {
+            case "standard":
+                notesFile.add(new Note(note[0], note[1]));
+
+                textView.setBackground(context.getDrawable(R.drawable.note_standard));
+                textView.setTag(R.string.noteType, R.string.noteTypeStandard);
+                textView.setTag(R.string.noteID, notesFile.size() - 1);
+                textView.setOnClickListener(this);
+
+                if (countBegGriff != countCurrGriff) {
+                    FrameLayout griff = (FrameLayout) strings.getChildAt(countCurrGriff);
+                    griff.addView(textView);
+                    griff.addView(linearLayout);
+                    countCurrGriff++;
+                } else {
+                    FrameLayout griff = drawGriff();
+                    griff.addView(textView);
+                    griff.addView(linearLayout);
+                    strings.addView(griff);
+                }
+
+                scrollView.scrollTo(strings.getWidth(), 0);
+                break;
+            case "update":
+                textView.setBackground(context.getDrawable(R.drawable.note_update));
+                textView.setTag(R.string.noteType, R.string.noteTypeUpdate);
+                textView.setOnClickListener(this);
+
+                parent.addView(textView);
+                break;
+            case "setUpdate":
+                notesFile.set(noteIndex, new Note(note[0], note[1]));
+
+                textView.setBackground(context.getDrawable(R.drawable.note_standard));
+                textView.setTag(R.string.noteType, R.string.noteTypeStandard);
+                textView.setTag(R.string.noteID, noteIndex);
+                textView.setOnClickListener(this);
+
+                parent.addView(textView);
+                break;
         }
-
-        scrollView.scrollTo(strings.getWidth(), 0);
-        notesFile.add(new Note(note[0], note[1]));
     }
 
     private FrameLayout drawGriff() {
@@ -412,6 +441,37 @@ public class TabRec implements View.OnClickListener{
         }
     }
 
+    private void updateNoteText(View note) {
+        FrameLayout parent = (FrameLayout) note.getParent();
+
+        String tag = (String) note.getTag(R.string.noteValue);
+        String[] noteTag = tag.split("_");
+        int noteString = Integer.parseInt(noteTag[0]);
+        int noteFret = Integer.parseInt(noteTag[1]);
+
+        parent.removeViewAt(1);
+
+        for (int i = 0; i < notesMargin.length; i++) {
+            setNoteText(new int[]{i, noteFret}, "update", parent, 0);
+        }
+    }
+
+    private void setUpdateNoteText(View note) {
+        FrameLayout parent = (FrameLayout) note.getParent();
+
+        String tag = (String) note.getTag(R.string.noteValue);
+        int noteIndex = (int) note.getTag(R.string.noteID);
+        String[] noteTag = tag.split("_");
+        int noteString = Integer.parseInt(noteTag[0]);
+        int noteFret = Integer.parseInt(noteTag[1]);
+
+        for (int i = 1; i < notesMargin.length + 1; i++) {
+            parent.removeViewAt(i);
+        }
+
+        setNoteText(new int[] {noteString, noteFret}, "setUpdate", parent, noteIndex);
+    }
+
     private void stopRec() {
         distanceNote = 150;
         strings.removeAllViews();
@@ -422,74 +482,61 @@ public class TabRec implements View.OnClickListener{
         countCurrGriff = 0;
     }
 
-    private void writeFile(String name) {
+    private void writeFile(String name, boolean update) {
         // запись табулатуры
         try {
-            File file = new File(context.getFilesDir(), name);
-
-            // создание файла
-            JsonWriter jsonWriter = new JsonWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-
-            // начало главного массива
-            jsonWriter.beginArray();
+            // создание json объекта
+            JSONObject jsonObject = new JSONObject();
+            int i = 0;
 
             for(Note note: notesFile) {
                 // создание объекта ноты в json
-                jsonWriter.beginObject();
+                JSONObject noteObject = new JSONObject();
+                noteObject.put("String", note.string);
+                noteObject.put("Fret", note.fret);
 
-                jsonWriter.name("String").value(note.string);
-                jsonWriter.name("Fret").value(note.fret);
-
-                jsonWriter.endObject();
+                jsonObject.put(String.valueOf(i), noteObject);
+                i++;
             }
-            jsonWriter.endArray();
-            jsonWriter.close();
+
+            // перезаписывать или нет
+            if (update) {
+                dbManager.updateTab(name, jsonObject.toString());
+            } else {
+                dbManager.addResult(name, jsonObject.toString());
+            }
 
             save = true;
             Toast.makeText(context, "Файл записан", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public void readJSONFile(String name) throws IOException, JSONException {
-        // чтение json файла
-
-        String jsonText = readFile(context.getFilesDir() + "/" + name);
+        // получение json строки из базы данных
+        String jsonText = dbManager.getTab(name);
 
         // создаём json объект
-        JSONArray obj = new JSONArray(jsonText);
+        JSONObject jsonObject = new JSONObject(jsonText);
 
-        for (int i = 0; i < obj.length(); i++) {
+        for (int i = 0; i < jsonObject.length(); i++) {
             int[] note = new int[2];
 
-            JSONObject noteObj = obj.getJSONObject(i);
+            JSONObject noteObj = jsonObject.getJSONObject(String.valueOf(i));
             note[0] = noteObj.getInt("String");
             note[1] = noteObj.getInt("Fret");
 
             // устанавливаем ноту на струну
-            setNoteText(note);
+            setNoteText(note, "standard", null, 0);
         }
-    }
-
-    private String readFile(String name) throws IOException {
-        File file = new File(name);
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        StringBuilder sb= new StringBuilder();
-        String s;
-        while((  s = br.readLine())!=null) {
-            sb.append(s);
-            sb.append("\n");
-        }
-        br.close();
-        return sb.toString();
     }
 
     public void createDialog(String nameDialog, String lastName) {
         switch (nameDialog){
             case "writeFile": {
                 // диалоговое окно для записи файла
-                String[] files = context.fileList();
+                ArrayList<String> tabNames = dbManager.getTabNames();
 
                 EditText editText = new EditText(context);
                 editText.setText(lastName);
@@ -502,15 +549,14 @@ public class TabRec implements View.OnClickListener{
                     String name = editText.getText().toString();
                     boolean indName = true;
 
-                    for(String fileName: files) {
-                        if(fileName.equals(name + ".json")) {
+                    for(String tabName: tabNames) {
+                        if(tabName.equals(name)) {
                             createDialog("rewriteFile", name);
                             indName = false;
                         }
                     }
-
                     if(indName) {
-                        writeFile(name + ".json");
+                        writeFile(name, false);
                     }
                 });
 
@@ -527,7 +573,7 @@ public class TabRec implements View.OnClickListener{
                     createDialog("writeFile", lastName);
                 });
                 builder.setPositiveButton("Да", (dialog, which) -> {
-                    writeFile(lastName + ".json");
+                    writeFile(lastName, true);
                 });
 
                 builder.show();
