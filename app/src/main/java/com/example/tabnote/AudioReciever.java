@@ -61,7 +61,7 @@ public class AudioReciever{
                     audioRecord.read(buffer, 0, bufferSize);
                     double[] res = frequencyScanner.extractFrequency(buffer, freq);
 
-                    Thread.sleep(10);
+                    Thread.sleep(30);
 
                     audioRecord.read(buffer2, 0, bufferSize);
                     double[] res2 = frequencyScanner.extractFrequency(buffer2, freq);

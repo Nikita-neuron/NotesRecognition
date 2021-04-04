@@ -80,7 +80,16 @@ public class PlayNotes {
         String fileName = "str_" + currentNote;
 
         boolean f = true;
-        String[] files = new String[] {"str_1_0", "str_2_0"};
+        String[] files = new String[] {
+                "str_1_0", "str_1_1", "str_1_2", "str_1_3", "str_1_4", "str_1_5", "str_1_6", "str_1_7",
+                "str_1_8", "str_1_9", "str_1_10", "str_1_11", "str_1_12",
+                "str_2_0", "str_2_1", "str_2_2", "str_2_3", "str_2_4", "str_2_5", "str_2_6", "str_2_7",
+                "str_2_8", "str_2_9", "str_2_10", "str_2_11", "str_2_12",
+                "str_3_0",
+                "str_4_0",
+                "str_5_0",
+                "str_6_0"
+        };
 
         for (String name : files) {
             if (name.equals(fileName)) {

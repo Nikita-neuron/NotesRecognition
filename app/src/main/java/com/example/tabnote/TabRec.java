@@ -164,14 +164,12 @@ public class TabRec implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if (v.getTag(R.string.noteValue) != null) {
-            System.out.println(v.getTag(R.string.noteType));
-            String type = String.valueOf(v.getTag(R.string.noteType));
-            System.out.println(type);
-            if (type.equals(R.string.noteTypeStandard)) {
+            int type = (int) v.getTag(R.string.noteType);
+            if (type == R.string.noteTypeStandard) {
                 updateNoteText(v);
             }
-            else if (type.equals(R.string.noteTypeUpdate)) {
-
+            else if (type == R.string.noteTypeUpdate) {
+                setUpdateNoteText(v);
             }
         }
         switch (v.getId()) {
@@ -294,7 +292,7 @@ public class TabRec implements View.OnClickListener{
                 // j - лад
                 double crat = freq / frequency[i][j];
                 double crat_freq = freq / crat;
-                System.out.println("crat: " + crat);
+//                System.out.println("crat: " + crat);
                 if(freq >= frequency[i][j] - er && freq <= frequency[i][j] + er) {
                     return new int[]{i, j};
                 }
@@ -401,6 +399,7 @@ public class TabRec implements View.OnClickListener{
             case "update":
                 textView.setBackground(context.getDrawable(R.drawable.note_update));
                 textView.setTag(R.string.noteType, R.string.noteTypeUpdate);
+                textView.setTag(R.string.noteID, noteIndex);
                 textView.setOnClickListener(this);
 
                 parent.addView(textView);
@@ -414,11 +413,13 @@ public class TabRec implements View.OnClickListener{
                 textView.setOnClickListener(this);
 
                 parent.addView(textView);
+                parent.addView(linearLayout);
                 break;
         }
     }
 
     private FrameLayout drawGriff() {
+        // создание layout грифа
         FrameLayout frameLayout = new FrameLayout(context);
 
         LinearLayout.LayoutParams layoutImageParams = new LinearLayout.LayoutParams(203, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -433,6 +434,7 @@ public class TabRec implements View.OnClickListener{
     }
 
     private void setBeginGriff() {
+        // создание первоначального грифа
         countBegGriff = width / 203;
 
         for (int i = 0; i < countBegGriff; i++) {
@@ -442,21 +444,7 @@ public class TabRec implements View.OnClickListener{
     }
 
     private void updateNoteText(View note) {
-        FrameLayout parent = (FrameLayout) note.getParent();
-
-        String tag = (String) note.getTag(R.string.noteValue);
-        String[] noteTag = tag.split("_");
-        int noteString = Integer.parseInt(noteTag[0]);
-        int noteFret = Integer.parseInt(noteTag[1]);
-
-        parent.removeViewAt(1);
-
-        for (int i = 0; i < notesMargin.length; i++) {
-            setNoteText(new int[]{i, noteFret}, "update", parent, 0);
-        }
-    }
-
-    private void setUpdateNoteText(View note) {
+        // список нот для изменения
         FrameLayout parent = (FrameLayout) note.getParent();
 
         String tag = (String) note.getTag(R.string.noteValue);
@@ -465,15 +453,32 @@ public class TabRec implements View.OnClickListener{
         int noteString = Integer.parseInt(noteTag[0]);
         int noteFret = Integer.parseInt(noteTag[1]);
 
-        for (int i = 1; i < notesMargin.length + 1; i++) {
-            parent.removeViewAt(i);
+        while (parent.getChildCount() > 1) {
+            parent.removeViewAt(1);
         }
 
+        for (int i = 0; i < notesMargin.length; i++) {
+            setNoteText(new int[]{i, noteFret}, "update", parent, noteIndex);
+        }
+    }
+
+    private void setUpdateNoteText(View note) {
+        // установление новой ноты
+        FrameLayout parent = (FrameLayout) note.getParent();
+
+        String tag = (String) note.getTag(R.string.noteValue);
+        int noteIndex = (int) note.getTag(R.string.noteID);
+        String[] noteTag = tag.split("_");
+        int noteString = Integer.parseInt(noteTag[0]);
+        int noteFret = Integer.parseInt(noteTag[1]);
+
+        while (parent.getChildCount() > 1) {
+            parent.removeViewAt(1);
+        }
         setNoteText(new int[] {noteString, noteFret}, "setUpdate", parent, noteIndex);
     }
 
     private void stopRec() {
-        distanceNote = 150;
         strings.removeAllViews();
         notesFile.clear();
 
