@@ -9,4 +9,7 @@
     <string name="noteTypeUpdate">Update</string>
     <string name="noteValue">value</string>
     <string name="noteID">noteID</string>
+    <string name="usersTabDeleteId">usersTabDeleteID</string>
+    <string name="usersTabId">userTabID</string>
+    <string name="userTabShare">share</string>
 </resources>

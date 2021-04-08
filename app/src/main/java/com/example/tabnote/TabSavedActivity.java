@@ -36,15 +36,18 @@ public class TabSavedActivity extends AppCompatActivity{
     LinearLayout strings;
 
     TabRec tabRec;
+    DBManager dbManager;
 
     @SuppressLint({"HandlerLeak", "WrongViewCast"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_cards_layout);
+        dbManager = DBManager.getInstance(this);
 
         // получение названия файла
-        fileName = getIntent().getExtras().getString("file");
+        fileName = getIntent().getExtras().getString("name");
+        String tabType = getIntent().getExtras().getString("tabType");
 
         // кнопки начала, остановки распознования, кнопка назад
         btnClear = findViewById(R.id.btnClear);
@@ -79,8 +82,17 @@ public class TabSavedActivity extends AppCompatActivity{
 
         try {
             // чтение табулатуры
-            tabRec.readJSONFile(fileName);
-        } catch (IOException | JSONException e) {
+            // получение json строки из базы данных
+            switch (tabType) {
+                case "local":
+                    String jsonText = dbManager.getTab(fileName);
+                    tabRec.readJSONFile(jsonText);
+                    break;
+                case "out":
+                    tabRec.readJSONFile(fileName);
+                    break;
+            }
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

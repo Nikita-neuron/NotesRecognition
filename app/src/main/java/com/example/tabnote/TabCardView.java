@@ -21,6 +21,7 @@ public class TabCardView extends LinearLayout{
 
     TextView tabCardName;
     ImageView cardDeleteTab;
+    ImageView share;
 
     String tabName;
     Context context;
@@ -60,5 +61,6 @@ public class TabCardView extends LinearLayout{
         cardDeleteTab = findViewById(R.id.cardDeleteTab);
         tabCardName = findViewById(R.id.tabCardName);
         tabCardName.setText(tabName);
+        share = findViewById(R.id.share);
     }
 }

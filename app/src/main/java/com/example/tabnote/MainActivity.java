@@ -9,43 +9,25 @@ package com.example.tabnote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static final int REQUEST_AUDIO_RECORD = 2;
 
     LinearLayout rootLayout;
-    LinearLayout tabCards;
-
-    Button createTab;
-
-    TextView textViewCards;
-
-    DBManager dbManager;
-
-    // массив карточек
-    ArrayList<TabCardView> cardsView = new ArrayList<>();
 
     @SuppressLint({"HandlerLeak", "WrongViewCast"})
     @Override
@@ -60,8 +42,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 = new ColorDrawable(R.color.topMenuColor);
         assert actionBar != null;
         actionBar.setBackgroundDrawable(colorDrawable);
-
-        dbManager = DBManager.getInstance(this);
 
         // проверка разрешений
         // запись с микрофона
@@ -80,42 +60,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     REQUEST_AUDIO_RECORD);
         }
 
-        // корневой элемент, карточки, кнопка новой табулатуры
-        rootLayout = findViewById(R.id.rootLayout);
-        tabCards = findViewById(R.id.tabCards);
-        createTab = findViewById(R.id.createTab);
+        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
+        FragmentAdapter adapterViewPager = new FragmentAdapter(getSupportFragmentManager());
+        vpPager.setAdapter(adapterViewPager);
 
-        createTab.setOnClickListener(this);
+        vpPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {  }
 
-        // все файлы в папке
-        ArrayList<String> tabNames = dbManager.getTabNames();
-
-        textViewCards = findViewById(R.id.noTabs);
-
-        if (tabNames.size() == 0) {
-            textViewCards.setText("У вас нет сохранённых табулатур");
-        } else {
-            textViewCards.setText("Сохранённые табулатуры");
-            // создание карточек с табулатурами
-            int i = 0;
-            for(String tabName: tabNames) {
-
-                TabCardView cardView = new TabCardView(this, tabName);
-                cardView.setTag(R.string.cardID, "card");
-                cardView.setTag(R.string.cardFile, tabName);
-                cardView.setOnClickListener(this);
-
-                cardView.cardDeleteTab.setTag(R.string.cardDelete, "delete");
-                cardView.cardDeleteTab.setTag(R.string.cardDeleteID, i);
-                cardView.cardDeleteTab.setOnClickListener(this);
-
-                tabCards.addView(cardView);
-
-                cardsView.add(cardView);
-                i++;
+            @Override
+            public void onPageSelected(int position) {
+                if (position ==1) {
+                    vpPager.getAdapter().notifyDataSetChanged();
+                }
             }
-        }
 
+            @Override
+            public void onPageScrollStateChanged(int state) { }
+        });
     }
 
     @Override
@@ -146,39 +108,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.createTab) {
-            // при нажатии на карточку
-            Intent in = new Intent(this, NewTabActivity.class);
-            startActivity(in);
-        }
-        else if (v.getTag(R.string.cardDelete) != null && v.getTag(R.string.cardDelete).equals("delete")) {
-            // при нажатии удалить
-
-            // получение карточки табулатуры
-            TabCardView card = cardsView.get((Integer) v.getTag(R.string.cardDeleteID));
-
-            // удаление карточки
-            cardsView.remove(card);
-            tabCards.removeView(card);
-            String tabName = (String) card.getTag(R.string.cardFile);
-            dbManager.deleteTab(tabName);
-
-            Toast.makeText(this, "Файл удалён", Toast.LENGTH_LONG).show();
-
-            if (cardsView.size() == 0) {
-                textViewCards.setText("У вас нет сохранённых табулатур");
-            }
-        }
-        else if (v.getTag(R.string.cardID) != null && v.getTag(R.string.cardID).equals("card")) {
-            // при нажатии на кнопку новой табулатуры
-            Intent in = new Intent(this, TabSavedActivity.class);
-            in.putExtra("file", v.getTag(R.string.cardFile)+"");
-            startActivity(in);
-        }
-    }
-
-
 }
