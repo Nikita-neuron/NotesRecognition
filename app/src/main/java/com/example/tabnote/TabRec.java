@@ -321,7 +321,7 @@ public class TabRec implements View.OnClickListener{
         // нули между отсчётами в буфере
 
         System.out.println("result freq: " + freq);
-        System.out.println("length of spectrum: " + spectrum.size());
+//        System.out.println("length of spectrum: " + spectrum.size());
 
         LinkedHashMap<Integer, Integer> finalSpectrum = spectrum;
         double finalFreq = freq;
@@ -354,14 +354,14 @@ public class TabRec implements View.OnClickListener{
 
                     return new int[]{i, j};
                 }
-                else {
-                    for (int k = 2; k <= 10; k++) {
-                        if (freq / k == frequency[i][j]) {
-                            System.out.println("crat_freq: " + crat_freq);
-                            return new int[] {i, j};
-                        }
-                    }
-                }
+//                else {
+//                    for (int k = 2; k <= 10; k++) {
+//                        if (freq / k == frequency[i][j]) {
+//                            System.out.println("crat_freq: " + crat_freq);
+//                            return new int[] {i, j};
+//                        }
+//                    }
+//                }
             }
         }
 //        return (int) Math.round(f);
@@ -401,14 +401,14 @@ public class TabRec implements View.OnClickListener{
             int val = (int) item.getValue();
 
             if (freq < 1500) {
-                if (val > maxx) {
+                if (val > maxx && val > 600000) {
                     maxx = val;
                     fr = freq;
                     n_pickes ++;
                 }
             }
 
-            if (val > 200000) {
+            if (val > 600000) {
                 arrayList.add(freq);
             }
 //            if (n_pickes > 25 || n_pickes < 15) break;
@@ -416,7 +416,14 @@ public class TabRec implements View.OnClickListener{
 
 
         System.out.println("pickes: " + n_pickes);
-        System.out.println(arrayList + " > 500000");
+        System.out.println(arrayList + " > 600000");
+        if (arrayList.size() > 0) {
+            if (arrayList.get(0) < 160) {
+                System.out.println("fr: " + fr);
+                fr /= 2.8;
+            }
+        }
+//        fr = arrayList.get(0);
 //        boolean filterPickes = n_pickes > 25 || n_pickes < 15;
         // 16 9 7 6
         if (countPickesSpectrums.size() > 0) {

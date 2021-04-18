@@ -7,13 +7,6 @@ import android.media.MediaRecorder;
 import android.os.Handler;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 public class AudioReciever{
@@ -27,8 +20,6 @@ public class AudioReciever{
     Context context;
 
     private boolean running = false;
-
-    private int ind = 0;
 
     FrequencyScanner frequencyScanner = new FrequencyScanner();
 
@@ -95,30 +86,30 @@ public class AudioReciever{
 //                    bufferZero[0] = buffer[0];
 //                    bufferZero2[0] = buffer2[0];
 
-                    ArrayList<Short> arrayList = new ArrayList<>();
-                    ArrayList<Short> arrayList2 = new ArrayList<>();
+//                    ArrayList<Short> arrayList = new ArrayList<>();
+//                    ArrayList<Short> arrayList2 = new ArrayList<>();
+//
+//                    for (int i = 0; i < bufferSize; i++) {
+//                        arrayList.add(buffer[i]);
+//                        arrayList2.add(buffer2[i]);
+//                        arrayList.add((short) 0);
+//                        arrayList2.add((short) 0);
+//                    }
+//
+//                    for (int i = 0; i < arrayList.size(); i++) {
+//                        bufferZero[i] = arrayList.get(i);
+//                        bufferZero2[i] = arrayList2.get(i);
+//                    }
 
                     for (int i = 0; i < bufferSize; i++) {
-                        arrayList.add(buffer[i]);
-                        arrayList2.add(buffer2[i]);
-                        arrayList.add((short) 0);
-                        arrayList2.add((short) 0);
+                        buffer[i] *= frequencyScanner.Gausse(i, bufferSize);
+                        buffer2[i] *= frequencyScanner.Gausse(i, bufferSize);
                     }
-
-                    for (int i = 0; i < arrayList.size(); i++) {
-                        bufferZero[i] = arrayList.get(i);
-                        bufferZero2[i] = arrayList2.get(i);
-                    }
-
-//                    for (int i = 0; i < bufferSize; i++) {
-//                        buffer[i] *= frequencyScanner.Gausse(i, bufferSize);
-//                        buffer2[i] *= frequencyScanner.Gausse(i, bufferSize);
+//                    for (int i = 0; i < bufferZero.length; i++) {
+//                        bufferZero[i] *= frequencyScanner.Gausse(i, bufferZero.length);
+//                        bufferZero2[i] *= frequencyScanner.Gausse(i, bufferZero2.length);
 //                    }
-                    for (int i = 0; i < bufferZero.length; i++) {
-                        bufferZero[i] *= frequencyScanner.Gausse(i, bufferZero.length);
-                        bufferZero2[i] *= frequencyScanner.Gausse(i, bufferZero2.length);
-                    }
-                    ind ++;
+//                    ind ++;
 
 //                    new Thread(){
 //                        @Override
@@ -135,11 +126,11 @@ public class AudioReciever{
 //                        }
 //                    }.start();
 
-//                    Complex[] buffer_complex = complex.realToComplex(buffer);
-//                    Complex[] buffer_complex2 = complex.realToComplex(buffer2);
+                    Complex[] buffer_complex = complex.realToComplex(buffer);
+                    Complex[] buffer_complex2 = complex.realToComplex(buffer2);
 
-                    Complex[] buffer_complex = complex.realToComplex(bufferZero);
-                    Complex[] buffer_complex2 = complex.realToComplex(bufferZero2);
+//                    Complex[] buffer_complex = complex.realToComplex(bufferZero);
+//                    Complex[] buffer_complex2 = complex.realToComplex(bufferZero2);
 
                     Complex[] res_complex = fftAnother.DecimationInFrequency(buffer_complex, false);
                     Complex[] res_complex2 = fftAnother.DecimationInFrequency(buffer_complex2, false);

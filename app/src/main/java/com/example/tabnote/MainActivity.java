@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position ==1) {
+                if (position == 1) {
                     vpPager.getAdapter().notifyDataSetChanged();
                 }
             }
