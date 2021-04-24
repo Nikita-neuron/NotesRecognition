@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:padding="3dp"
+    android:background="@drawable/tab_btn_background">
+
+        <TextView
+            android:id="@+id/userNameTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ddd"
+            android:textSize="13sp"
+            android:textColor="#3E3E3E"
+            android:layout_alignParentEnd="true" />
+
+        <ImageView
+            android:id="@+id/tabImage"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:src="@drawable/tabulatur_img"
+            android:contentDescription="@string/todo"
+            android:layout_below="@+id/userNameTab"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tabImage">
+
+            <ImageView
+                android:id="@+id/usersTabDelete"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/trash"
+                android:contentDescription="@string/todo"/>
+
+            <TextView
+                android:id="@+id/userTabName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="tab"
+                android:textColor="#000"
+                android:textSize="18sp"
+                android:layout_centerHorizontal="true"/>
+
+            <ImageView
+                android:id="@+id/share"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/share"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@string/todo" />
+        </RelativeLayout>
+
+</RelativeLayout>

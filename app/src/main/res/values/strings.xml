@@ -12,4 +12,5 @@
     <string name="usersTabDeleteId">usersTabDeleteID</string>
     <string name="usersTabId">userTabID</string>
     <string name="userTabShare">share</string>
+    <string name="todo">TODO</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.tabnote;
+package com.example.tabnote.Recognition;
 
 import android.content.Context;
 import android.media.AudioFormat;
@@ -28,12 +28,12 @@ public class AudioReciever{
         this.context = context;
     }
 
-    protected void start() {
+    public void start() {
         running = true;
         loopback();
     }
 
-    protected  void stop() throws InterruptedException {
+    public void stop() throws InterruptedException {
         running = false;
         Rthread.join();
     }

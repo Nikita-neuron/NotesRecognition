@@ -1,4 +1,4 @@
-package com.example.tabnote;
+package com.example.tabnote.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,17 +12,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tabnote.R;
+import com.example.tabnote.ServerMessages;
+import com.example.tabnote.Tab;
+import com.example.tabnote.TabSavedActivity;
+
 import java.util.ArrayList;
 
 public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.ViewHolder> implements View.OnClickListener{
 
-    private final LayoutInflater inflater;
     private final ArrayList<Tab> tabArrayList;
     String userName;
 
-    public UsersTabsAdapter(Context context, ArrayList<Tab> tabArrayList) {
+    public UsersTabsAdapter(Context context, ArrayList<Tab> tabArrayList, String userName) {
         this.tabArrayList = tabArrayList;
-        this.inflater = LayoutInflater.from(context);
+        this.userName = userName;
     }
 
     @Override
@@ -47,6 +51,7 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
             Intent in = new Intent(v.getContext(), TabSavedActivity.class);
             in.putExtra("tabType", "out");
             in.putExtra("name", tab.body);
+            in.putExtra("userName", userName);
             v.getContext().startActivity(in);
         }
     }
@@ -55,13 +60,12 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
     @Override
     public UsersTabsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.tab_users_layout, parent, false);
+                .inflate(R.layout.card_users_layout, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UsersTabsAdapter.ViewHolder holder, int position) {
-        userName = "Test";
 
         Tab tab = tabArrayList.get(position);
 
@@ -88,6 +92,7 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
         private final TextView userName;
         private final TextView title;
         private final ImageView tabDelete;
+        private final ImageView share;
         private final View view;
 
         public ViewHolder(View view) {
@@ -95,6 +100,10 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
             userName = view.findViewById(R.id.userNameTab);
             title = view.findViewById(R.id.userTabName);
             tabDelete = view.findViewById(R.id.usersTabDelete);
+            share = view.findViewById(R.id.share);
+
+            ((ViewGroup) share.getParent()).removeView(share);
+
             this.view = view;
         }
     }

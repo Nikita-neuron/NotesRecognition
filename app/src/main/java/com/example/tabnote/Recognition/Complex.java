@@ -1,6 +1,5 @@
-package com.example.tabnote;
+package com.example.tabnote.Recognition;
 
-import android.content.Context;
 import android.util.Log;
 
 /**

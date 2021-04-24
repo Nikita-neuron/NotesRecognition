@@ -7,105 +7,184 @@
 
 package com.example.tabnote;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
+import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.widget.LinearLayout;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
+import android.app.Fragment;
+import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.example.tabnote.Fragments.UserFragment;
+import com.example.tabnote.Fragments.UsersTabsFragment;
 
-public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static final int REQUEST_AUDIO_RECORD = 2;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
-    LinearLayout rootLayout;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-    @SuppressLint({"HandlerLeak", "WrongViewCast"})
+    RelativeLayout fragmentsChange;
+    RelativeLayout btnUsersTabs;
+    RelativeLayout btnHome;
+    RelativeLayout btnTabAdd;
+    RelativeLayout bottomMenu;
+    RelativeLayout topMenuUser;
+    RelativeLayout userLogin;
+
+    Button btnUserLogin;
+
+    TextView userTitleType;
+    TextView userNameView;
+
+    UserFragment userFragment;
+    UsersTabsFragment usersTabsFragment;
+
+    String userName;
+
+    @SuppressLint({"HandlerLeak", "WrongViewCast", "CommitTransaction"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActionBar actionBar;
-        actionBar = getSupportActionBar();
-        @SuppressLint("ResourceAsColor")
-        ColorDrawable colorDrawable
-                = new ColorDrawable(R.color.topMenuColor);
-        assert actionBar != null;
-        actionBar.setBackgroundDrawable(colorDrawable);
+        userName = getIntent().getExtras().getString("userName");
 
-        // проверка разрешений
-        // запись с микрофона
-        int permissionStatusAudio = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-        // запись файлов
-        int permissionStatusStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        fragmentsChange = findViewById(R.id.fragmentsChange);
 
-        if (permissionStatusAudio != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO},
-                    REQUEST_AUDIO_RECORD);
+        btnUsersTabs = findViewById(R.id.btn_users_tabs);
+        btnUsersTabs.setOnClickListener(this);
+
+        btnHome = findViewById(R.id.btn_home);
+        btnHome.setOnClickListener(this);
+
+        btnTabAdd = findViewById(R.id.btn_tab_add);
+        btnTabAdd.setOnClickListener(this);
+
+        bottomMenu = findViewById(R.id.bottom_menu);
+
+        userTitleType = findViewById(R.id.user_title_type);
+        userNameView = findViewById(R.id.user_name);
+
+        topMenuUser = findViewById(R.id.topMenuUser);
+        userLogin = findViewById(R.id.user_login);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("userName", userName);
+
+        userFragment = new UserFragment();
+        userFragment.setArguments(bundle);
+
+        usersTabsFragment = new UsersTabsFragment();
+        usersTabsFragment.setArguments(bundle);
+
+        activeMenuItem(btnHome);
+
+        changeFragment(getFragmentManager().beginTransaction(), userFragment);
+
+        if (userName.equals("none")) {
+            topMenuUser.setVisibility(View.INVISIBLE);
+
+            btnUserLogin = findViewById(R.id.btn_user_login);
+            btnUserLogin.setOnClickListener(this);
+        } else {
+            userLogin.setVisibility(View.INVISIBLE);
+            userNameView.setText(userName);
+
+            topMenuUser.setOnClickListener(this);
         }
+    }
 
-        if (permissionStatusStorage != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_AUDIO_RECORD);
+    private void changeFragment(FragmentTransaction fragmentTransaction, Fragment fragment) {
+        fragmentTransaction.replace(R.id.fragmentsChange, fragment);
+        fragmentTransaction.commit();
+    }
+
+    private void changeMenuColor(RelativeLayout item, boolean active) {
+        int color = active ? Color.WHITE : Color.BLACK;
+        item.getChildAt(0).getBackground().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        ((TextView) item.getChildAt(1)).setTextColor(color);
+    }
+
+    private void activeMenuItem(RelativeLayout item) {
+        for (int i = 0; i < bottomMenu.getChildCount(); i++) {
+            changeMenuColor((RelativeLayout) bottomMenu.getChildAt(i), false);
         }
+        changeMenuColor(item, true);
+    }
 
-        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
-        FragmentAdapter adapterViewPager = new FragmentAdapter(getSupportFragmentManager());
-        vpPager.setAdapter(adapterViewPager);
+    @SuppressLint({"CommitTransaction", "NonConstantResourceId"})
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_users_tabs:
+                activeMenuItem(btnUsersTabs);
 
-        vpPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {  }
+                userTitleType.setText("Табулатуры пользователей");
 
-            @Override
-            public void onPageSelected(int position) {
-                if (position == 1) {
-                    vpPager.getAdapter().notifyDataSetChanged();
+                changeFragment(getFragmentManager().beginTransaction(), usersTabsFragment);
+                break;
+            case R.id.btn_tab_add:
+                activeMenuItem(btnTabAdd);
+
+                Intent intent = new Intent(this, NewTabActivity.class);
+                intent.putExtra("userName", userName);
+                startActivity(intent);
+                break;
+            case R.id.btn_home:
+                activeMenuItem(btnHome);
+
+                userTitleType.setText("Ваши табулатуры");
+
+                changeFragment(getFragmentManager().beginTransaction(), userFragment);
+                break;
+            case R.id.btn_user_login:
+                Intent intent1 = new Intent(this, LogInActivity.class);
+                startActivity(intent1);
+                break;
+            case R.id.topMenuUser:
+                showPopupMenu(v.getContext(), v);
+                break;
+        }
+    }
+
+    public void showPopupMenu(Context context, View view) {
+        PopupMenu popupMenu = new PopupMenu(context, view);
+        try {
+            Field[] fields = popupMenu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(popupMenu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
                 }
             }
-
-            @Override
-            public void onPageScrollStateChanged(int state) { }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        popupMenu.inflate(R.menu.popupmenu);
+        popupMenu.setOnMenuItemClickListener(this);
+        popupMenu.show();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        // проверка ответа пользователя по разрешениям
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_EXTERNAL_STORAGE) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    // Предоставляет дополнительную информацию, если разрешение
-                    // не было дано, а пользователь должен получить разъяснения
-                    Snackbar.make(rootLayout, "Без данного разрешения, вы не сможете сохранять и читать табулатуры", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("OK", view -> ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    REQUEST_EXTERNAL_STORAGE)).show();
-                }
-
-        } else if (requestCode == REQUEST_AUDIO_RECORD){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.RECORD_AUDIO)) {
-                // Предоставляет дополнительную информацию, если разрешение
-                // не было дано, а пользователь должен получить разъяснения
-                Snackbar.make(rootLayout, "Без данного разрешения, приложение не сможет распозновать ноты", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("OK", view -> ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_AUDIO_RECORD)).show();
-            }
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.userLogout) {
+            Intent intent = new Intent(this, StartActivity.class);
+            startActivity(intent);
+            return true;
         }
+        return false;
     }
 }

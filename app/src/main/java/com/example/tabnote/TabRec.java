@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tabnote.Recognition.AudioReciever;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,7 +29,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -100,12 +104,14 @@ public class TabRec implements View.OnClickListener{
 
     ArrayList<Integer> countPickesSpectrums = new ArrayList<>();
 
-    private int ind = 0;
+    String userName;
 
     @SuppressLint("HandlerLeak")
     public TabRec(Context context, View btnClear, View btnPausePlay, View btnSave, View btnPlay,
-                  View frequencyText, View strings, View scrollView) {
+                  View frequencyText, View strings, View scrollView, String userName) {
         this.context = context;
+
+        this.userName = userName;
 
         dbManager = DBManager.getInstance(context);
 
@@ -224,11 +230,11 @@ public class TabRec implements View.OnClickListener{
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
                     } else {
                         btnPausePlay.setImageBitmap(pauseImage);
-                        try {
-                            audioReciever.stop();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            audioReciever.stop();
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                         stopRec();
                     }
                 } else {
@@ -325,21 +331,21 @@ public class TabRec implements View.OnClickListener{
 
         LinkedHashMap<Integer, Integer> finalSpectrum = spectrum;
         double finalFreq = freq;
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    FileOutputStream out = context.openFileOutput("spectrum" + finalFreq + ".txt", Context.MODE_PRIVATE);
-                    PrintWriter write = new PrintWriter(out);
-                    for (Integer key: spectrum.keySet()) {
-                        write.println(key + " " + spectrum.get(key));
-                    }
-                    write.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                try {
+//                    FileOutputStream out = context.openFileOutput("spectrum" + finalFreq + ".txt", Context.MODE_PRIVATE);
+//                    PrintWriter write = new PrintWriter(out);
+//                    for (Integer key: spectrum.keySet()) {
+//                        write.println(key + " " + spectrum.get(key));
+//                    }
+//                    write.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
 
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {
@@ -350,7 +356,6 @@ public class TabRec implements View.OnClickListener{
                 double crat_freq = freq / crat;
 //                System.out.println("crat: " + crat);
                 if(freq >= frequency[i][j] - er && freq <= frequency[i][j] + er) {
-                    ind++;
 
                     return new int[]{i, j};
                 }
@@ -369,6 +374,17 @@ public class TabRec implements View.OnClickListener{
 
         // если не совпадает, то возвращаем -1
         return new int[] {-1, -1};
+    }
+
+    private double calculateAverage(List <Integer> marks) {
+        Integer sum = 0;
+        if(!marks.isEmpty()) {
+            for (Integer mark : marks) {
+                sum += mark;
+            }
+            return sum.doubleValue() / marks.size();
+        }
+        return sum;
     }
 
     public double getMaxIndex(LinkedHashMap<Integer, Integer> spectrum) {
@@ -395,6 +411,9 @@ public class TabRec implements View.OnClickListener{
 //        fr = fr * 24000 / spectrum.size();
 
         Set set = spectrum.entrySet();
+        ArrayList<Integer> valList = new ArrayList<>();
+        ArrayList<Integer> freqList = new ArrayList<>();
+        int ind = 0;
         for (Object o : set) {
             Map.Entry item = (Map.Entry) o;
             int freq = (int) item.getKey();
@@ -410,6 +429,11 @@ public class TabRec implements View.OnClickListener{
 
             if (val > 600000) {
                 arrayList.add(freq);
+                if (ind <= 6) {
+                    freqList.add(freq);
+                    valList.add(val);
+                }
+                ind ++;
             }
 //            if (n_pickes > 25 || n_pickes < 15) break;
         }
@@ -417,12 +441,33 @@ public class TabRec implements View.OnClickListener{
 
         System.out.println("pickes: " + n_pickes);
         System.out.println(arrayList + " > 600000");
+
+        System.out.println("max freq: " + freqList);
+        System.out.println("max val: " + valList);
+
+//        if (arrayList.size() > 0) {
+//            if (arrayList.get(0) < 160) {
+//                System.out.println("fr: " + fr);
+//                fr /= 2.8;
+//            }
+//        }
+
         if (arrayList.size() > 0) {
-            if (arrayList.get(0) < 160) {
+            if (Collections.min(freqList) < 170) {
                 System.out.println("fr: " + fr);
+
+                int zeroFr = arrayList.get(0);
+
+                if (zeroFr >= 140 && zeroFr <= 148 ) System.out.println("RESULT: 4 СТРУНА ОТКРЫТЫЙ ЛАД");
+                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");
+                else if (zeroFr >= 150 && zeroFr <= 156 ) System.out.println("RESULT: 6 СТРУНА ОТКРЫТЫЙ ЛАД");
+
                 fr /= 2.8;
             }
         }
+
+        System.out.println("average freq: " + calculateAverage(freqList));
+
 //        fr = arrayList.get(0);
 //        boolean filterPickes = n_pickes > 25 || n_pickes < 15;
         // 16 9 7 6
@@ -587,12 +632,14 @@ public class TabRec implements View.OnClickListener{
     }
 
     private void stopRec() {
-        strings.removeAllViews();
-        notesFile.clear();
+        if (notesFile.size() > 0) {
+            strings.removeAllViews();
+            notesFile.clear();
 
-        scrollView.scrollTo(0, 0);
-        setBeginGriff();
-        countCurrGriff = 0;
+            scrollView.scrollTo(0, 0);
+            setBeginGriff();
+            countCurrGriff = 0;
+        }
     }
 
     private void writeFile(String name, boolean update) {
@@ -668,6 +715,7 @@ public class TabRec implements View.OnClickListener{
                     if(indName) {
                         writeFile(name, false);
                         Intent in = new Intent(context, MainActivity.class);
+                        in.putExtra("userName", userName);
                         context.startActivity(in);
                     }
                 });
@@ -698,6 +746,7 @@ public class TabRec implements View.OnClickListener{
 
                 builder.setNegativeButton("Нет", (dialog, which) -> {
                     Intent in = new Intent(context, MainActivity.class);
+                    in.putExtra("userName", userName);
                     context.startActivity(in);
                 });
                 builder.setPositiveButton("Да", (dialog, which) -> {

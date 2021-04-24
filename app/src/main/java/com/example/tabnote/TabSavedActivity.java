@@ -38,6 +38,8 @@ public class TabSavedActivity extends AppCompatActivity{
     TabRec tabRec;
     DBManager dbManager;
 
+    String userName;
+
     @SuppressLint({"HandlerLeak", "WrongViewCast"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,8 @@ public class TabSavedActivity extends AppCompatActivity{
         // получение названия файла
         fileName = getIntent().getExtras().getString("name");
         String tabType = getIntent().getExtras().getString("tabType");
+
+        userName = getIntent().getExtras().getString("userName");
 
         // кнопки начала, остановки распознования, кнопка назад
         btnClear = findViewById(R.id.btnClear);
@@ -65,20 +69,20 @@ public class TabSavedActivity extends AppCompatActivity{
         strings = findViewById(R.id.strings);
 
         // кнопка назад
-        ActionBar actionBar =getSupportActionBar();
-        assert actionBar != null;
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        @SuppressLint("ResourceAsColor")
-        ColorDrawable colorDrawable
-                = new ColorDrawable(R.color.topMenuColor);
-        actionBar.setBackgroundDrawable(colorDrawable);
+//        ActionBar actionBar =getSupportActionBar();
+//        assert actionBar != null;
+//        actionBar.setHomeButtonEnabled(true);
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+//        @SuppressLint("ResourceAsColor")
+//        ColorDrawable colorDrawable
+//                = new ColorDrawable(R.color.topMenuColor);
+//        actionBar.setBackgroundDrawable(colorDrawable);
 
         // картинки плея и паузы
         playImage = BitmapFactory.decodeResource(getResources(), R.drawable.microphone);
         pauseImage = BitmapFactory.decodeResource(getResources(), R.drawable.no_microphone);
 
-        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView);
+        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView, userName);
 
         try {
             // чтение табулатуры
@@ -115,6 +119,7 @@ public class TabSavedActivity extends AppCompatActivity{
                 tabRec.createDialog("back", "");
             } else {
                 Intent in = new Intent(this, MainActivity.class);
+                in.putExtra("userName", userName);
                 startActivity(in);
             }
             return true;
@@ -138,6 +143,7 @@ public class TabSavedActivity extends AppCompatActivity{
             tabRec.createDialog("back", "");
         } else {
             Intent in = new Intent(this, MainActivity.class);
+            in.putExtra("userName", userName);
             startActivity(in);
         }
     }

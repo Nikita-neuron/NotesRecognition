@@ -13,16 +13,16 @@
         android:layout_centerInParent="true"
         tools:ignore="UselessParent">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <TextView
+            android:id="@+id/no_tabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminateDrawable="@drawable/spinner_ring"
-            android:indeterminateOnly="true"
-            android:layout_centerInParent="true"/>
+            android:text="У вас нет сохранённых табулатур"
+            android:layout_centerInParent="true"
+            android:textColor="#000"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/usersTabs"
+            android:id="@+id/userTabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>

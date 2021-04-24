@@ -1,4 +1,4 @@
-package com.example.tabnote;
+package com.example.tabnote.Recognition;
 
 import org.jtransforms.dct.DoubleDCT_1D;
 

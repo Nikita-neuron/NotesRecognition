@@ -2,11 +2,9 @@ package com.example.tabnote;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import androidx.recyclerview.widget.RecyclerView;
+import com.example.tabnote.Adapters.UsersTabsAdapter;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

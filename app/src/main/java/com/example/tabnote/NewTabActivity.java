@@ -38,11 +38,15 @@ public class NewTabActivity extends AppCompatActivity{
 
     TabRec tabRec;
 
+    String userName;
+
     @SuppressLint("HandlerLeak")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_cards_layout);
+
+        userName = getIntent().getExtras().getString("userName");
 
         // размеры экрана
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
@@ -62,15 +66,15 @@ public class NewTabActivity extends AppCompatActivity{
         playImage = BitmapFactory.decodeResource(getResources(), R.drawable.microphone);
         pauseImage = BitmapFactory.decodeResource(getResources(), R.drawable.no_microphone);
 
-        // кнопка назад
-        ActionBar actionBar =getSupportActionBar();
-        assert actionBar != null;
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        @SuppressLint("ResourceAsColor")
-        ColorDrawable colorDrawable
-                = new ColorDrawable(R.color.topMenuColor);
-        actionBar.setBackgroundDrawable(colorDrawable);
+//        // кнопка назад
+//        ActionBar actionBar =getSupportActionBar();
+//        assert actionBar != null;
+//        actionBar.setHomeButtonEnabled(true);
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+//        @SuppressLint("ResourceAsColor")
+//        ColorDrawable colorDrawable
+//                = new ColorDrawable(R.color.topMenuColor);
+//        actionBar.setBackgroundDrawable(colorDrawable);
 
         // массив струн
         frameLayouts = new FrameLayout[6];
@@ -79,7 +83,7 @@ public class NewTabActivity extends AppCompatActivity{
 
         scrollView = findViewById(R.id.horizontalScroll);
 
-        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView);
+        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView, userName);
     }
 
     @Override
@@ -100,6 +104,7 @@ public class NewTabActivity extends AppCompatActivity{
                 tabRec.createDialog("back", "");
             } else {
                 Intent in = new Intent(this, MainActivity.class);
+                in.putExtra("userName", userName);
                 startActivity(in);
             }
             return true;
@@ -123,6 +128,7 @@ public class NewTabActivity extends AppCompatActivity{
             tabRec.createDialog("back", "");
         } else {
             Intent in = new Intent(this, MainActivity.class);
+            in.putExtra("userName", userName);
             startActivity(in);
         }
     }

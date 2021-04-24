@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        tools:ignore="UselessParent">
+
+        <EditText
+            android:id="@+id/editTextSignLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_user_login"
+            android:drawablePadding="10dp"
+            android:padding="5dp"
+            android:textColorHint="#6F6F6F"
+            android:textSize="30sp"
+            android:background="@drawable/ic_edittext_login"
+            android:hint="Имя"
+            android:textColor="#000"
+            android:inputType="text"
+            android:layout_marginBottom="10dp"/>
+
+        <EditText
+            android:id="@+id/editTextSignPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_key"
+            android:drawablePadding="10dp"
+            android:padding="5dp"
+            android:textColorHint="#6F6F6F"
+            android:textSize="30sp"
+            android:background="@drawable/ic_edittext_login"
+            android:textColor="#000"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            tools:ignore="TextFields"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btn_signUp"
+            app:backgroundTint="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_background_btn_login"
+            android:layout_marginBottom="22dp"
+            android:textColor="#323B3D"
+            android:textSize="20sp"
+            android:text="Зарегистрироваться"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

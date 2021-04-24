@@ -1,21 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#9DDCE0">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/vpPager"
+    <ImageView
+        android:id="@+id/wave"
+        android:scaleType="fitXY"
+        android:layout_width="match_parent"
+        android:layout_height="235dp"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/ic_wave" />
+
+    <RelativeLayout
+        android:id="@+id/user_main_header"
+        android:layout_margin="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.viewpager.widget.PagerTabStrip
-            android:id="@+id/pager_header"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/user_title_type"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp" />
+            android:background="@drawable/ic_background_title"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="#000"
+            android:text="Ваши табулатуры"/>
 
-    </androidx.viewpager.widget.ViewPager>
-</LinearLayout>
+        <RelativeLayout
+            android:id="@+id/topMenu"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/topMenuUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/user_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_user_icon"
+                    android:contentDescription="@string/todo" />
+
+                <TextView
+                    android:layout_toEndOf="@+id/user_icon"
+                    android:layout_marginStart="10dp"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="#000"
+                    android:text="User"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btn_user_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="@null"
+                    android:background="@drawable/ic_background_user_login"
+                    android:textColor="#323B3D"
+                    android:text="Войти"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/user_main_header"
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:contentDescription="@string/todo" />
+
+    <RelativeLayout
+        android:id="@+id/fragmentsChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wave"
+        android:layout_above="@+id/bottom_menu">
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_background_bottom_menu"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:paddingHorizontal="20dp">
+
+        <RelativeLayout
+            android:id="@+id/btn_users_tabs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/users_tabs_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_users_tabs_icon"
+                android:contentDescription="@string/todo" />
+
+            <TextView
+                android:layout_below="@+id/users_tabs_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:text="Табулатуры"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/btn_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:id="@+id/home_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_home_icon"
+                android:contentDescription="@string/todo" />
+
+            <TextView
+                android:layout_below="@+id/home_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:text="Главная"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/btn_tab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:id="@+id/user_add_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_add_icon"
+                android:contentDescription="@string/todo" />
+
+            <TextView
+                android:layout_below="@+id/user_add_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:text="Добавить"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

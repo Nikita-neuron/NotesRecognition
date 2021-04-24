@@ -31,22 +31,22 @@ public class DBManager {
         createTablesIfNeedBe();
     }
 
-    void addResult(String name, String text) {
+    public void addResult(String name, String text) {
         String request = String.format("INSERT INTO %s VALUES ('%s', '%s');", tableName, name, text);
         db.execSQL(request);
     }
 
-    void updateTab(String tabName, String text) {
+    public void updateTab(String tabName, String text) {
         String request = String.format("UPDATE %s SET %s = '%s' WHERE %s = '%s';", tableName, tableTabBody, text, tableTabName, tabName);
         db.execSQL(request);
     }
 
-    void deleteTab(String tabName) {
+    public void deleteTab(String tabName) {
         String request = String.format("DELETE FROM %s WHERE %s = '%s';", tableName, tableTabName, tabName);
         db.execSQL(request);
     }
 
-    ArrayList<String> getTabNames() {
+    public ArrayList<String> getTabNames() {
         ArrayList<String> names = new ArrayList<>();
 
         String request = String.format("SELECT %s FROM %s", tableTabName, tableName);
@@ -65,7 +65,7 @@ public class DBManager {
         return names;
     }
 
-    String getTab(String tabName) {
+    public String getTab(String tabName) {
         String data = "";
         String request = String.format("SELECT * FROM %s WHERE %s = '%s';", tableName, tableTabName, tabName);
         @SuppressLint("Recycle")
