@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tabnote.DBManager;
 import com.example.tabnote.R;
-import com.example.tabnote.ServerMessages;
-import com.example.tabnote.Tab;
+import com.example.tabnote.ServerCommunication.ServerMessages;
+import com.example.tabnote.ServerCommunication.Tab;
 import com.example.tabnote.TabSavedActivity;
 
 import java.util.ArrayList;
@@ -130,41 +130,17 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
             case "shareTab": {
                 // диалоговое окно опубликования табулатуры
 
-                ArrayList<Tab> tabArrayList = new ArrayList<>();
-
-                ServerMessages serverMessages = new ServerMessages();
-                serverMessages.getAll(tabArrayList);
+                ServerMessages serverMessages = ServerMessages.getInstance();
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
                 builder.setMessage("Другие пользователи смогут увидеть вашу табулатуру");
                 builder.setNegativeButton("Отмена", (dialog, which) -> { });
                 builder.setPositiveButton("OK", (dialog, which) -> {
-                    boolean indName = true;
-
-                    for(Tab tab: tabArrayList) {
-                        if(tab.userName.equals(userName) && tab.title.equals(cardTitle)) {
-                            createDialog("shareExist", context, cardTitle);
-                            indName = false;
-                        }
-                    }
-                    if(indName) {
-                        String jsonText = dbManager.getTab(cardTitle);
-                        Tab tab = new Tab(0, userName, cardTitle, jsonText);
-                        serverMessages.addTab(tab, context);
-                        Toast.makeText(context, "Ваша табулатура опубликована", Toast.LENGTH_LONG).show();
-                    }
+                    String jsonText = dbManager.getTab(cardTitle);
+                    Tab tab = new Tab(userName, cardTitle, jsonText);
+                    serverMessages.addTab(tab, context);
                 });
-
-                builder.show();
-                break;
-            }
-            case "shareExist": {
-                // диалоговое окно для опубликованных табулатур
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-                builder.setMessage("Данная табулатура уже опубликована");
-                builder.setPositiveButton("OK", (dialog, which) -> { });
 
                 builder.show();
                 break;

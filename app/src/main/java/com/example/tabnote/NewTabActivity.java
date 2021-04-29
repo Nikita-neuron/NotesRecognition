@@ -32,6 +32,7 @@ public class NewTabActivity extends AppCompatActivity{
 
     LinearLayout strings;
 
+    LinearLayout tabRoot;
 
     public int width;
     public int height;
@@ -52,6 +53,8 @@ public class NewTabActivity extends AppCompatActivity{
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
         width = displaymetrics.widthPixels;  // deprecated
         height = displaymetrics.heightPixels;  // deprecated
+
+        tabRoot = findViewById(R.id.tabRoot);
 
         // кнопки начала, остановки распознования, кнопка назад
         btnClear = findViewById(R.id.btnClear);
@@ -83,7 +86,7 @@ public class NewTabActivity extends AppCompatActivity{
 
         scrollView = findViewById(R.id.horizontalScroll);
 
-        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView, userName);
+        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView, userName, tabRoot);
     }
 
     @Override

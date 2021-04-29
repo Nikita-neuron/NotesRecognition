@@ -11,12 +11,15 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +57,8 @@ public class TabRec implements View.OnClickListener{
 
     AudioReciever audioReciever;
     Handler handler;
+
+    Spinner spinner;
 
     PlayNotes playNotes;
 
@@ -106,19 +111,21 @@ public class TabRec implements View.OnClickListener{
 
     String userName;
 
+    String[] thresholds = new String[] {"400000", "500000", "600000", "700000"};
+    String threshold = "600000";
+
     @SuppressLint("HandlerLeak")
     public TabRec(Context context, View btnClear, View btnPausePlay, View btnSave, View btnPlay,
-                  View frequencyText, View strings, View scrollView, String userName) {
+                  View frequencyText, View strings, View scrollView, String userName, View tabRoot) {
         this.context = context;
-
         this.userName = userName;
 
         dbManager = DBManager.getInstance(context);
 
         // размеры экрана
         DisplayMetrics displaymetrics = context.getResources().getDisplayMetrics();
-        width = displaymetrics.widthPixels;  // deprecated
-        height = displaymetrics.heightPixels;  // deprecated
+        width = displaymetrics.widthPixels;
+        height = displaymetrics.heightPixels;
 
         // кнопки начала, остановки распознования, кнопка назад
         this.btnClear = (Button) btnClear;
@@ -137,10 +144,24 @@ public class TabRec implements View.OnClickListener{
 
         this.strings = (LinearLayout) strings;
 
-        // массив струн
-        frameLayouts = new FrameLayout[6];
-
         this.scrollView = (HorizontalScrollView) scrollView;
+
+        this.spinner = tabRoot.findViewById(R.id.threshold);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, thresholds);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.spinner.setAdapter(adapter);
+        this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                threshold = thresholds[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         this.btnPausePlay.setOnClickListener(this);
         this.btnSave.setOnClickListener(this);
@@ -420,14 +441,14 @@ public class TabRec implements View.OnClickListener{
             int val = (int) item.getValue();
 
             if (freq < 1500) {
-                if (val > maxx && val > 600000) {
+                if (val > maxx && val > Integer.parseInt(threshold)) {
                     maxx = val;
                     fr = freq;
                     n_pickes ++;
                 }
             }
 
-            if (val > 600000) {
+            if (val > Integer.parseInt(threshold)) {
                 arrayList.add(freq);
                 if (ind <= 6) {
                     freqList.add(freq);
@@ -440,7 +461,7 @@ public class TabRec implements View.OnClickListener{
 
 
         System.out.println("pickes: " + n_pickes);
-        System.out.println(arrayList + " > 600000");
+        System.out.println(arrayList + " > " + threshold);
 
         System.out.println("max freq: " + freqList);
         System.out.println("max val: " + valList);

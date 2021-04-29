@@ -30,6 +30,8 @@ public class TabSavedActivity extends AppCompatActivity{
     HorizontalScrollView scrollView;
     TextView frequencyText;
 
+    LinearLayout tabRoot;
+
     String fileName;
 
     Button btnPlay;
@@ -68,6 +70,8 @@ public class TabSavedActivity extends AppCompatActivity{
 
         strings = findViewById(R.id.strings);
 
+        tabRoot = findViewById(R.id.tabRoot);
+
         // кнопка назад
 //        ActionBar actionBar =getSupportActionBar();
 //        assert actionBar != null;
@@ -82,7 +86,7 @@ public class TabSavedActivity extends AppCompatActivity{
         playImage = BitmapFactory.decodeResource(getResources(), R.drawable.microphone);
         pauseImage = BitmapFactory.decodeResource(getResources(), R.drawable.no_microphone);
 
-        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView, userName);
+        tabRec = new TabRec(this, btnClear, btnPausePlay, btnSave, btnPlay, frequencyText, strings, scrollView, userName, tabRoot);
 
         try {
             // чтение табулатуры

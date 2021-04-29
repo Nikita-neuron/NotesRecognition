@@ -1,6 +1,5 @@
 package com.example.tabnote.Adapters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,44 +12,45 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tabnote.R;
-import com.example.tabnote.ServerMessages;
-import com.example.tabnote.Tab;
+import com.example.tabnote.ServerCommunication.ServerMessages;
+import com.example.tabnote.ServerCommunication.Tab;
 import com.example.tabnote.TabSavedActivity;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.ViewHolder> implements View.OnClickListener{
 
-    private final ArrayList<Tab> tabArrayList;
+    private List<Tab> tabList;
     String userName;
 
-    public UsersTabsAdapter(Context context, ArrayList<Tab> tabArrayList, String userName) {
-        this.tabArrayList = tabArrayList;
+    ServerMessages serverMessages;
+
+    public UsersTabsAdapter(List<Tab> tabList, String userName) {
+        this.tabList = tabList;
         this.userName = userName;
+
+        serverMessages = ServerMessages.getInstance();
     }
 
     @Override
     public void onClick(View v) {
         if (v.getTag(R.string.usersTabDeleteId) != null) {
-            Tab tab = tabArrayList.get((Integer) v.getTag(R.string.usersTabDeleteId));
+            Tab tab = tabList.get((Integer) v.getTag(R.string.usersTabDeleteId));
 
-            if (!tab.userName.equals(userName)) {
+            if (!tab.getUsername().equals(userName)) {
                 Toast.makeText(v.getContext(), "Вы не можете удалить данную табулатуру", Toast.LENGTH_LONG).show();
                 return;
             }
+            serverMessages.removeTab(tab, v.getContext());
 
-            ServerMessages serverMessages = new ServerMessages();
-            serverMessages.deleteTab(tab, v.getContext());
-            Toast.makeText(v.getContext(), "Ваша табулатура удалена", Toast.LENGTH_LONG).show();
-
-            tabArrayList.remove(tab);
+            tabList.remove(tab);
             notifyDataSetChanged();
         }
         else if (v.getTag(R.string.usersTabId) != null) {
-            Tab tab = tabArrayList.get((Integer) v.getTag(R.string.usersTabId));
+            Tab tab = tabList.get((Integer) v.getTag(R.string.usersTabId));
             Intent in = new Intent(v.getContext(), TabSavedActivity.class);
             in.putExtra("tabType", "out");
-            in.putExtra("name", tab.body);
+            in.putExtra("name", tab.getBody());
             in.putExtra("userName", userName);
             v.getContext().startActivity(in);
         }
@@ -67,14 +67,14 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
     @Override
     public void onBindViewHolder(@NonNull UsersTabsAdapter.ViewHolder holder, int position) {
 
-        Tab tab = tabArrayList.get(position);
+        Tab tab = tabList.get(position);
 
         TextView userName = holder.userName;
         TextView title = holder.title;
         ImageView tabDelete = holder.tabDelete;
 
-        userName.setText(tab.userName);
-        title.setText(tab.title);
+        userName.setText(tab.getUsername());
+        title.setText(tab.getTitle());
 
         holder.view.setTag(R.string.usersTabId, position);
         tabDelete.setTag(R.string.usersTabDeleteId, position);
@@ -85,7 +85,7 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
 
     @Override
     public int getItemCount() {
-        return tabArrayList.size();
+        return tabList == null ? 0 : tabList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -108,9 +108,8 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
         }
     }
 
-    public void swap(ArrayList<Tab> tabs) {
-        tabArrayList.clear();
-        tabArrayList.addAll(tabs);
+    public void swap(List<Tab> tabs) {
+        tabList = tabs;
         notifyDataSetChanged();
     }
 }
