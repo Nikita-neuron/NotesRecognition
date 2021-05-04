@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.tabnote.database.DBUserManager;
 import com.google.android.material.snackbar.Snackbar;
 
 public class StartActivity extends AppCompatActivity implements View.OnClickListener{
@@ -26,9 +27,21 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     Button login;
     TextView withoutAuth;
 
+    DBUserManager dbUserManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dbUserManager = DBUserManager.getInstance(this);
+
+        String user = dbUserManager.existUser();
+
+        if (!user.equals("")) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("userName", user);
+            startActivity(intent);
+        }
 
         setContentView(R.layout.activity_satrt);
 

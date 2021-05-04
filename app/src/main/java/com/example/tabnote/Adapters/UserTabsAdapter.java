@@ -3,6 +3,8 @@ package com.example.tabnote.Adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +15,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tabnote.DBManager;
+import com.example.tabnote.database.DBManager;
 import com.example.tabnote.R;
 import com.example.tabnote.ServerCommunication.ServerMessages;
 import com.example.tabnote.ServerCommunication.Tab;
-import com.example.tabnote.TabSavedActivity;
+import com.example.tabnote.TabActivity;
 
 import java.util.ArrayList;
 
@@ -107,7 +109,7 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
         }
         else if (v.getTag(R.string.cardFile) != null) {
             // при нажатии на кнопку табулатуры
-            Intent in = new Intent(v.getContext(), TabSavedActivity.class);
+            Intent in = new Intent(v.getContext(), TabActivity.class);
             in.putExtra("tabType", "local");
             in.putExtra("userName", userName);
             in.putExtra("name", v.getTag(R.string.cardFile)+"");
@@ -132,14 +134,18 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
 
                 ServerMessages serverMessages = ServerMessages.getInstance();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
 
                 builder.setMessage("Другие пользователи смогут увидеть вашу табулатуру");
                 builder.setNegativeButton("Отмена", (dialog, which) -> { });
                 builder.setPositiveButton("OK", (dialog, which) -> {
                     String jsonText = dbManager.getTab(cardTitle);
                     Tab tab = new Tab(userName, cardTitle, jsonText);
-                    serverMessages.addTab(tab, context);
+                    if (internetConnection(context)) {
+                        serverMessages.addTab(tab, context);
+                    } else {
+                        Toast.makeText(context, "Нет подключения к интернету", Toast.LENGTH_LONG).show();
+                    }
                 });
 
                 builder.show();
@@ -147,7 +153,7 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
             }
             case "unLogIn":
                 // диалоговое окно если пользователь не авторизован
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
 
                 builder.setTitle("Вы не авторизованы");
                 builder.setMessage("Войдите, чтобы опубликовать табулатуру");
@@ -173,5 +179,17 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
             tabShare = view.findViewById(R.id.share);
             this.view = view;
         }
+    }
+
+    private boolean internetConnection(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED)
+                || (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                .getState() == NetworkInfo.State.CONNECTED);
     }
 }

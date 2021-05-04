@@ -1,10 +1,3 @@
-// http://learn-android.ru/news/sozdanie_sostavnykh_view_obektov/2015-03-08-63.html
-
-// идеи:
-// 1. заменить запись в файл на запись в БД
-// 2. заменить кнопку плея при записи на значок микрофона
-// 3. может быть поменять белый фон на картинку гитары
-
 package com.example.tabnote;
 
 import android.annotation.SuppressLint;
@@ -26,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.tabnote.Fragments.UserFragment;
 import com.example.tabnote.Fragments.UsersTabsFragment;
+import com.example.tabnote.database.DBUserManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -50,11 +44,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     String userName;
 
+    DBUserManager dbUserManager;
+
     @SuppressLint({"HandlerLeak", "WrongViewCast", "CommitTransaction"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dbUserManager = DBUserManager.getInstance(this);
 
         userName = getIntent().getExtras().getString("userName");
 
@@ -135,8 +133,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_tab_add:
                 activeMenuItem(btnTabAdd);
 
-                Intent intent = new Intent(this, NewTabActivity.class);
+                Intent intent = new Intent(this, TabActivity.class);
                 intent.putExtra("userName", userName);
+                intent.putExtra("tabType", "new");
                 startActivity(intent);
                 break;
             case R.id.btn_home:
@@ -181,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.userLogout) {
+            dbUserManager.deleteUser(userName);
             Intent intent = new Intent(this, StartActivity.class);
             startActivity(intent);
             return true;

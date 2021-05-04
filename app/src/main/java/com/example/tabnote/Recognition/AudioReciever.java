@@ -35,7 +35,8 @@ public class AudioReciever{
 
     public void stop() throws InterruptedException {
         running = false;
-        Rthread.join();
+//        Rthread.join();
+//        Rthread.interrupt();
     }
 
     protected void loopback() {
@@ -62,6 +63,13 @@ public class AudioReciever{
 
         audioRecord.startRecording();
         Rthread = new Thread(() -> {
+            if (Thread.interrupted()) {
+                try {
+                    throw new InterruptedException();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             while (running) {
                 try {
                     audioRecord.read(buffer, 0, bufferSize);

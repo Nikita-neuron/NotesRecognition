@@ -1,6 +1,9 @@
 package com.example.tabnote.Adapters;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tabnote.R;
 import com.example.tabnote.ServerCommunication.ServerMessages;
 import com.example.tabnote.ServerCommunication.Tab;
-import com.example.tabnote.TabSavedActivity;
+import com.example.tabnote.TabActivity;
 
 import java.util.List;
 
@@ -41,16 +44,20 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
                 Toast.makeText(v.getContext(), "Вы не можете удалить данную табулатуру", Toast.LENGTH_LONG).show();
                 return;
             }
-            serverMessages.removeTab(tab, v.getContext());
+            if (internetConnection(v.getContext())) {
+                serverMessages.removeTab(tab, v.getContext());
+            } else {
+                Toast.makeText(v.getContext(), "Нет подключения к интернету", Toast.LENGTH_LONG).show();
+            }
 
             tabList.remove(tab);
             notifyDataSetChanged();
         }
         else if (v.getTag(R.string.usersTabId) != null) {
             Tab tab = tabList.get((Integer) v.getTag(R.string.usersTabId));
-            Intent in = new Intent(v.getContext(), TabSavedActivity.class);
+            Intent in = new Intent(v.getContext(), TabActivity.class);
             in.putExtra("tabType", "out");
-            in.putExtra("name", tab.getBody());
+            in.putExtra("body", tab.getBody());
             in.putExtra("userName", userName);
             v.getContext().startActivity(in);
         }
@@ -111,5 +118,17 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
     public void swap(List<Tab> tabs) {
         tabList = tabs;
         notifyDataSetChanged();
+    }
+
+    private boolean internetConnection(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED)
+                || (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                .getState() == NetworkInfo.State.CONNECTED);
     }
 }

@@ -1,15 +1,19 @@
 package com.example.tabnote.Fragments;
 
 import android.app.Fragment;
-import android.content.Intent;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
-import com.example.tabnote.MainActivity;
+import com.example.tabnote.database.DBUserManager;
 import com.example.tabnote.R;
 import com.example.tabnote.ServerCommunication.ServerMessages;
 import com.example.tabnote.ServerCommunication.User;
@@ -20,7 +24,13 @@ public class SignUpFragment extends Fragment implements View.OnClickListener{
 
     Button btnSignUp;
 
+    ProgressBar progressBar;
+
+    View view;
+
     ServerMessages serverMessages;
+
+    DBUserManager dbUserManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,13 +42,20 @@ public class SignUpFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.signup_fragment, container, false);
 
+        dbUserManager = DBUserManager.getInstance(view.getContext());
+
         editTextSignLogin = view.findViewById(R.id.editTextSignLogin);
         editTextSignPassword = view.findViewById(R.id.editTextSignPassword);
 
         btnSignUp = view.findViewById(R.id.btn_signUp);
         btnSignUp.setOnClickListener(this);
 
+        progressBar = view.findViewById(R.id.progressBarSignUp);
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
+
         serverMessages = ServerMessages.getInstance();
+
+        this.view = view;
 
         return view;
     }
@@ -51,8 +68,24 @@ public class SignUpFragment extends Fragment implements View.OnClickListener{
 
             if (!userName.equals("") && !password.equals("")) {
                 User user = new User(userName, password);
-                serverMessages.registration(user, v.getContext());
+                if (internetConnection()) {
+                    serverMessages.registration(user, v.getContext(), progressBar, dbUserManager);
+                } else {
+                    Toast.makeText(view.getContext(), "Нет подключения к интернету", Toast.LENGTH_LONG).show();
+                }
             }
         }
+    }
+
+    private boolean internetConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) view.getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED)
+                || (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                .getState() == NetworkInfo.State.CONNECTED);
     }
 }

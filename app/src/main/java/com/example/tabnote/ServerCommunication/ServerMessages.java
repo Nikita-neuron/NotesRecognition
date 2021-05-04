@@ -7,6 +7,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.tabnote.Adapters.UsersTabsAdapter;
+import com.example.tabnote.database.DBUserManager;
 import com.example.tabnote.MainActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,7 +35,10 @@ public class ServerMessages {
         service = ServiceGenerator.createService(TabNoteService.class);
     }
 
-    public void login(User user, Context context) {
+    public void login(User user, Context context, ProgressBar progressBar, DBUserManager dbUserManager) {
+
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+
         Call<Token> callAsync = service.login(user);
 
         callAsync.enqueue(new Callback<Token>() {
@@ -63,11 +67,16 @@ public class ServerMessages {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    progressBar.setVisibility(ProgressBar.INVISIBLE);
                     return;
                 }
 
                 Token token = response.body();
                 System.out.println(token);
+
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+                dbUserManager.addUser(user.getUsername(), user.getPassword());
 
                 Intent intent = new Intent(context, MainActivity.class);
                 intent.putExtra("userName", user.getUsername());
@@ -81,8 +90,10 @@ public class ServerMessages {
         });
     }
 
-    public void registration(User user, Context context) {
-        System.out.println(user.getUsername());
+    public void registration(User user, Context context, ProgressBar progressBar, DBUserManager dbUserManager) {
+
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+
         Call<Token> callAsync = service.registration(user);
 
         callAsync.enqueue(new Callback<Token>() {
@@ -111,11 +122,16 @@ public class ServerMessages {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    progressBar.setVisibility(ProgressBar.INVISIBLE);
                     return;
                 }
 
                 Token token = response.body();
                 System.out.println(token);
+
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+                dbUserManager.addUser(user.getUsername(), user.getPassword());
 
                 Intent intent = new Intent(context, MainActivity.class);
                 intent.putExtra("userName", user.getUsername());
@@ -153,6 +169,7 @@ public class ServerMessages {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    progressBar.setVisibility(ProgressBar.INVISIBLE);
                     return;
                 }
 

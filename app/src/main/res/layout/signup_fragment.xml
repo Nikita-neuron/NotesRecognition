@@ -58,5 +58,12 @@
 
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBarSignUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateDrawable="@drawable/spinner_ring"
+        android:indeterminateOnly="true"
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>

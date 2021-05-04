@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tabnote.Adapters.UserTabsAdapter;
-import com.example.tabnote.DBManager;
+import com.example.tabnote.database.DBManager;
 import com.example.tabnote.R;
 
 import java.util.ArrayList;

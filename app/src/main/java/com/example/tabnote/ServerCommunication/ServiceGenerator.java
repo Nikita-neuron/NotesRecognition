@@ -20,8 +20,8 @@ public class ServiceGenerator {
 
 //    private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
-            .connectTimeout(1, TimeUnit.MINUTES)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS);
     private static final Gson gson = new GsonBuilder().setLenient().create();
 

@@ -9,11 +9,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -24,13 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tabnote.Recognition.AudioReciever;
+import com.example.tabnote.database.DBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -39,24 +37,28 @@ import java.util.Map;
 import java.util.Set;
 
 public class TabRec implements View.OnClickListener{
-    boolean reco = false;
 
-    Bitmap playImage;
-    Bitmap pauseImage;
+    public boolean reco = false;
+
+    Bitmap microphoneImage;
+    Bitmap noMicrophoneImage;
     Bitmap guitarGriff;
-    Button btnClear;
-    ImageView btnPausePlay;
+
+    ImageView btnClear;
+    ImageView btnMicrophone;
     ImageView btnSave;
-    FrameLayout[] frameLayouts;
+    ImageView btnBack;
+    ImageView btnPlay;
+
     TextView textView;
+
     HorizontalScrollView scrollView;
+
     TextView frequencyText;
-    Button btnPlay;
 
     LinearLayout strings;
 
-    AudioReciever audioReciever;
-    Handler handler;
+    public AudioReciever audioReciever;
 
     Spinner spinner;
 
@@ -65,13 +67,15 @@ public class TabRec implements View.OnClickListener{
     int[] notesMargin = new int[] {
             40, 120, 220, 300, 380, 470
     };
+
+    int[] notesMarginTest = new int[] {
+            2, 34, 66, 100, 130, 160
+    };
+
     // начальное количество картинок грифа
     int countBegGriff;
     // количество нарисованных сначало грифов
     int countCurrGriff = 0;
-
-    // ноты
-    char[] notes = new char[]{'E', 'B', 'G', 'D', 'A', 'E'};
 
     // частоты
     // по вертикале - струны, по горизонтале - лады
@@ -87,10 +91,6 @@ public class TabRec implements View.OnClickListener{
 
     // погрешность
     public int er = 3;
-    // максимальное расстояние между нотами на струне
-    public int maxDistanceNote = 100;
-    // начальное расстояние
-    public int distanceNote = 150;
 
     public int width;
     public int height;
@@ -101,7 +101,7 @@ public class TabRec implements View.OnClickListener{
     ArrayList<Note> notesFile = new ArrayList<>();
 
     // сохранён файл или нет
-    boolean save = true;
+    public boolean save = true;
 
     Context context;
 
@@ -114,44 +114,52 @@ public class TabRec implements View.OnClickListener{
     String[] thresholds = new String[] {"400000", "500000", "600000", "700000"};
     String threshold = "600000";
 
+    int imageWidth;
+    int imageHeight;
+
     @SuppressLint("HandlerLeak")
-    public TabRec(Context context, View btnClear, View btnPausePlay, View btnSave, View btnPlay,
-                  View frequencyText, View strings, View scrollView, String userName, View tabRoot) {
+    public TabRec(Context context, String userName, View tabRoot) {
         this.context = context;
         this.userName = userName;
 
+        // get database
         dbManager = DBManager.getInstance(context);
 
-        // размеры экрана
+        // get screen size
         DisplayMetrics displaymetrics = context.getResources().getDisplayMetrics();
         width = displaymetrics.widthPixels;
         height = displaymetrics.heightPixels;
 
-        // кнопки начала, остановки распознования, кнопка назад
-        this.btnClear = (Button) btnClear;
-        this.btnPausePlay = (ImageView) btnPausePlay;
-        this.btnSave = (ImageView) btnSave;
+        // find clear, microphone, save and play  buttons
+        btnClear = tabRoot.findViewById(R.id.btnClear);;
+        btnMicrophone = tabRoot.findViewById(R.id.btnPausePlay);
+        btnSave = tabRoot.findViewById(R.id.btnSaveTab);
+        btnPlay = tabRoot.findViewById(R.id.btnPlay);
+        btnBack = tabRoot.findViewById(R.id.arrowBack);
 
-        this.btnPlay = (Button) btnPlay;
+        // get textView to show frequency
+        frequencyText = tabRoot.findViewById(R.id.frequencyText);
 
-        this.frequencyText = (TextView) frequencyText;
+        // images microphone and no microphone
+        microphoneImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.microphone);
+        noMicrophoneImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.no_microphone);
 
-        // картинки плея и паузы
-        playImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.microphone);
-        pauseImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.no_microphone);
-
+        // get guitar image
         guitarGriff = BitmapFactory.decodeResource(context.getResources(), R.drawable.strings);
 
-        this.strings = (LinearLayout) strings;
+        // find view of strings
+        strings = tabRoot.findViewById(R.id.strings);
 
-        this.scrollView = (HorizontalScrollView) scrollView;
+        // find scrolls
+        scrollView = tabRoot.findViewById(R.id.horizontalScroll);
 
-        this.spinner = tabRoot.findViewById(R.id.threshold);
+        // find spinner
+        spinner = tabRoot.findViewById(R.id.threshold);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, thresholds);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.spinner.setAdapter(adapter);
-        this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 threshold = thresholds[position];
@@ -163,12 +171,14 @@ public class TabRec implements View.OnClickListener{
             }
         });
 
-        this.btnPausePlay.setOnClickListener(this);
-        this.btnSave.setOnClickListener(this);
-        this.btnClear.setOnClickListener(this);
-        this.btnPlay.setOnClickListener(this);
+        btnMicrophone.setOnClickListener(this);
+        btnSave.setOnClickListener(this);
+        btnClear.setOnClickListener(this);
+        btnPlay.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
 
-        handler = new Handler() {
+        // get spectrum fom audioReceiver
+        Handler handler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 // получаем ноту по частоте, переданной из детектора
                 LinkedHashMap<Integer, Integer> spectrum = (LinkedHashMap<Integer, Integer>) msg.obj;
@@ -177,15 +187,18 @@ public class TabRec implements View.OnClickListener{
                 int[] note = getNote(spectrum);
 
                 // если распознано, то добавляем на струну
-                if(note[0] >= 0 && note[1] >= 0) {
+                if (note[0] >= 0 && note[1] >= 0) {
                     setNoteText(note, "standard", null, 0);
                 }
-            };
+            }
         };
 
         audioReciever = new AudioReciever(handler, context);
 
-        playNotes = new PlayNotes(context, notesFile, this.strings);
+        playNotes = new PlayNotes(context, notesFile, this.strings, btnPlay);
+
+        imageWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75, context.getResources().getDisplayMetrics());
+        imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 190, context.getResources().getDisplayMetrics());
 
         setBeginGriff();
 
@@ -212,7 +225,7 @@ public class TabRec implements View.OnClickListener{
                     if (reco) {
                         // если пауза
                         reco = false;
-                        btnPausePlay.setImageBitmap(pauseImage);
+                        btnMicrophone.setImageBitmap(noMicrophoneImage);
                         try {
                             audioReciever.stop();
                         } catch (InterruptedException e) {
@@ -221,7 +234,7 @@ public class TabRec implements View.OnClickListener{
                     } else {
                         // если старт
                         reco = true;
-                        btnPausePlay.setImageBitmap(playImage);
+                        btnMicrophone.setImageBitmap(microphoneImage);
                         audioReciever.start();
                     }
                 } else {
@@ -250,7 +263,7 @@ public class TabRec implements View.OnClickListener{
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
                     } else {
-                        btnPausePlay.setImageBitmap(pauseImage);
+                        btnMicrophone.setImageBitmap(noMicrophoneImage);
 //                        try {
 //                            audioReciever.stop();
 //                        } catch (InterruptedException e) {
@@ -269,11 +282,32 @@ public class TabRec implements View.OnClickListener{
                 if (!playNote) {
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
-                    } else {
+                    } else if (notesFile.size() > 0){
                         playNote();
                     }
                 } else {
                     playNotes.pause();
+                }
+                break;
+            }
+
+            case (R.id.arrowBack): {
+                btnMicrophone.setImageBitmap(microphoneImage);
+                if (reco) {
+                    try {
+                        audioReciever.stop();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                reco = false;
+
+                if (!save) {
+                    createDialog("back", "");
+                } else {
+                    Intent in = new Intent(context, MainActivity.class);
+                    in.putExtra("userName", userName);
+                    context.startActivity(in);
                 }
                 break;
             }
@@ -338,16 +372,8 @@ public class TabRec implements View.OnClickListener{
         double freq = 0;
         freq = getMaxIndex(spectrum);
         frequencyText.setText("Frequency: " + freq);
-        // входной порог в буфер почистить его
-        // эквалайзер
-        // поиграться со временем между буферами (10)
-        // скрипка
-        // посчитать частоты по формуле
 
-        //....
-        // нули между отсчётами в буфере
-
-        System.out.println("result freq: " + freq);
+//        System.out.println("result freq: " + freq);
 //        System.out.println("length of spectrum: " + spectrum.size());
 
         LinkedHashMap<Integer, Integer> finalSpectrum = spectrum;
@@ -460,11 +486,11 @@ public class TabRec implements View.OnClickListener{
         }
 
 
-        System.out.println("pickes: " + n_pickes);
-        System.out.println(arrayList + " > " + threshold);
+//        System.out.println("pickes: " + n_pickes);
+//        System.out.println(arrayList + " > " + threshold);
 
-        System.out.println("max freq: " + freqList);
-        System.out.println("max val: " + valList);
+//        System.out.println("max freq: " + freqList);
+//        System.out.println("max val: " + valList);
 
 //        if (arrayList.size() > 0) {
 //            if (arrayList.get(0) < 160) {
@@ -473,21 +499,31 @@ public class TabRec implements View.OnClickListener{
 //            }
 //        }
 
+        if (freqList.size() > 1) {
+            double cf = 50.0;
+            double cp = 100.0;
+
+            double ampl_freq_distance = Math.sqrt(Math.pow((freqList.get(0) - freqList.get(freqList.size()-1)) / cf, 2) +
+                    Math.pow((valList.get(0) - valList.get(valList.size()-1)) / cp, 2));
+
+            System.out.println(ampl_freq_distance);
+        }
+
         if (arrayList.size() > 0) {
             if (Collections.min(freqList) < 170) {
-                System.out.println("fr: " + fr);
+//                System.out.println("fr: " + fr);
 
                 int zeroFr = arrayList.get(0);
 
-                if (zeroFr >= 140 && zeroFr <= 148 ) System.out.println("RESULT: 4 СТРУНА ОТКРЫТЫЙ ЛАД");
-                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");
-                else if (zeroFr >= 150 && zeroFr <= 156 ) System.out.println("RESULT: 6 СТРУНА ОТКРЫТЫЙ ЛАД");
+//                if (zeroFr >= 140 && zeroFr <= 148 ) System.out.println("RESULT: 4 СТРУНА ОТКРЫТЫЙ ЛАД");
+//                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");
+//                else if (zeroFr >= 150 && zeroFr <= 156 ) System.out.println("RESULT: 6 СТРУНА ОТКРЫТЫЙ ЛАД");
 
                 fr /= 2.8;
             }
         }
 
-        System.out.println("average freq: " + calculateAverage(freqList));
+//        System.out.println("average freq: " + calculateAverage(freqList));
 
 //        fr = arrayList.get(0);
 //        boolean filterPickes = n_pickes > 25 || n_pickes < 15;
@@ -530,13 +566,16 @@ public class TabRec implements View.OnClickListener{
         // добавление ноты на струну
         // утановление margin для ноты
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        LinearLayout.LayoutParams layoutPlayParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams layoutPlayParams = new LinearLayout.LayoutParams(imageWidth, imageHeight);
 
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setLayoutParams(layoutPlayParams);
         linearLayout.setBackgroundColor(Color.argb(0, 106, 161, 71));
 
-        params.setMargins(80, notesMargin[note[0]],0,0);
+        int noteMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, notesMarginTest[note[0]], context.getResources().getDisplayMetrics());
+
+//        params.setMargins(80, notesMargin[note[0]],0,0);
+        params.setMargins(80, noteMargin,0,0);
 
         textView = new TextView(context);
         textView.setText(note[1]+"");
@@ -596,7 +635,7 @@ public class TabRec implements View.OnClickListener{
         // создание layout грифа
         FrameLayout frameLayout = new FrameLayout(context);
 
-        LinearLayout.LayoutParams layoutImageParams = new LinearLayout.LayoutParams(203, LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams layoutImageParams = new LinearLayout.LayoutParams(imageWidth, imageHeight);
 
         ImageView imageView = new ImageView(context);
         imageView.setImageBitmap(guitarGriff);
@@ -609,7 +648,7 @@ public class TabRec implements View.OnClickListener{
 
     private void setBeginGriff() {
         // создание первоначального грифа
-        countBegGriff = width / 203;
+        countBegGriff = width / imageWidth;
 
         for (int i = 0; i < countBegGriff; i++) {
             FrameLayout griff = drawGriff();
@@ -631,7 +670,7 @@ public class TabRec implements View.OnClickListener{
             parent.removeViewAt(1);
         }
 
-        for (int i = 0; i < notesMargin.length; i++) {
+        for (int i = 0; i < notesMarginTest.length; i++) {
             setNoteText(new int[]{i, noteFret}, "update", parent, noteIndex);
         }
     }
@@ -718,7 +757,7 @@ public class TabRec implements View.OnClickListener{
 
                 EditText editText = new EditText(context);
                 editText.setText(lastName);
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
 
                 builder.setMessage("Укажите название табулатуры");
                 builder.setView(editText);
@@ -746,7 +785,7 @@ public class TabRec implements View.OnClickListener{
             }
             case "rewriteFile": {
                 // диалоговое окно для перезаписи файла
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
 
                 builder.setTitle("Данный файл уже существует");
                 builder.setMessage("Вы хотите его перезаписать?");
@@ -762,7 +801,7 @@ public class TabRec implements View.OnClickListener{
             }
             case "back": {
                 // диалоговое окно при выходе без сохранения
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
                 builder.setMessage("Сохранить изменения?");
 
                 builder.setNegativeButton("Нет", (dialog, which) -> {
