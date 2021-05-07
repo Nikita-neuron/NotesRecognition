@@ -263,13 +263,13 @@ public class TabRec implements View.OnClickListener{
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
                     } else {
-                        btnMicrophone.setImageBitmap(noMicrophoneImage);
+//                        btnMicrophone.setImageBitmap(noMicrophoneImage);
 //                        try {
 //                            audioReciever.stop();
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
 //                        }
-                        stopRec();
+                        createDialog("clear", "");
                     }
                 } else {
                     Toast.makeText(context, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
@@ -419,6 +419,8 @@ public class TabRec implements View.OnClickListener{
 //        return (int) Math.round(f);
 //        return (int) f
 
+        save = false;
+
         // если не совпадает, то возвращаем -1
         return new int[] {-1, -1};
     }
@@ -503,6 +505,8 @@ public class TabRec implements View.OnClickListener{
             double cf = 50.0;
             double cp = 100.0;
 
+            // если равно нулю, то не выводить
+
             double ampl_freq_distance = Math.sqrt(Math.pow((freqList.get(0) - freqList.get(freqList.size()-1)) / cf, 2) +
                     Math.pow((valList.get(0) - valList.get(valList.size()-1)) / cp, 2));
 
@@ -519,7 +523,7 @@ public class TabRec implements View.OnClickListener{
 //                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");
 //                else if (zeroFr >= 150 && zeroFr <= 156 ) System.out.println("RESULT: 6 СТРУНА ОТКРЫТЫЙ ЛАД");
 
-                fr /= 2.8;
+//                fr /= 2.8;
             }
         }
 
@@ -560,8 +564,6 @@ public class TabRec implements View.OnClickListener{
     private void setNoteText(int[] note, String type, FrameLayout parent, int noteIndex) {
         // note[0]  - струна
         // note[1] - лад
-
-        save = false;
 
         // добавление ноты на струну
         // утановление margin для ноты
@@ -811,6 +813,20 @@ public class TabRec implements View.OnClickListener{
                 });
                 builder.setPositiveButton("Да", (dialog, which) -> {
                     createDialog("writeFile", "");
+                });
+
+                builder.show();
+                break;
+            }
+            case "clear": {
+                // диалоговое окно при выходе без сохранения
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
+                builder.setTitle("Очистить табулатуру?");
+                builder.setMessage("Все изменения будут потеряны");
+
+                builder.setNegativeButton("Нет", (dialog, which) -> { });
+                builder.setPositiveButton("Да", (dialog, which) -> {
+                    stopRec();
                 });
 
                 builder.show();

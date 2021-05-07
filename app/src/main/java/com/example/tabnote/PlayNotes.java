@@ -106,7 +106,8 @@ public class PlayNotes {
                 "str_4_8", "str_4_9", "str_4_10", "str_4_11", "str_4_12",
                 "str_5_0", "str_5_1", "str_5_2", "str_5_3", "str_5_4", "str_5_5", "str_5_6", "str_5_7",
                 "str_5_8", "str_5_9", "str_5_10", "str_5_11", "str_5_12",
-                "str_6_0"
+                "str_6_0", "str_6_1", "str_6_2", "str_6_3", "str_6_4", "str_6_5", "str_6_6", "str_6_7",
+                "str_6_8", "str_6_9", "str_6_10", "str_6_11", "str_6_12"
         };
 
         for (String name : files) {
