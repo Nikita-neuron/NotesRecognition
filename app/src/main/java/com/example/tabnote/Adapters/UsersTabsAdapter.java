@@ -18,6 +18,10 @@ import com.example.tabnote.R;
 import com.example.tabnote.ServerCommunication.ServerMessages;
 import com.example.tabnote.ServerCommunication.Tab;
 import com.example.tabnote.TabActivity;
+import com.example.tabnote.TabPreview;
+import com.example.tabnote.database.DBManager;
+
+import org.json.JSONException;
 
 import java.util.List;
 
@@ -28,11 +32,15 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
 
     ServerMessages serverMessages;
 
-    public UsersTabsAdapter(List<Tab> tabList, String userName) {
+    Context context;
+
+    public UsersTabsAdapter(List<Tab> tabList, String userName, Context context) {
         this.tabList = tabList;
         this.userName = userName;
 
         serverMessages = ServerMessages.getInstance();
+
+        this.context = context;
     }
 
     @Override
@@ -88,6 +96,15 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
 
         tabDelete.setOnClickListener(this);
         holder.view.setOnClickListener(this);
+
+        String jsonText = tab.getBody();
+
+        TabPreview tabPreview = new TabPreview(context, holder.view);
+        try {
+            tabPreview.readJSONFile(jsonText);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

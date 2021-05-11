@@ -78,58 +78,62 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fillViewport="true"
-                tools:ignore="UselessParent"
+                tools:ignore="ScrollViewCount,UselessParent"
                 android:layout_centerVertical="true">
 
-                <LinearLayout
-                    android:id="@+id/strings"
+                <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="210dp">
 
-<!--                    <FrameLayout-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content">-->
+                    <LinearLayout
+                        android:id="@+id/strings"
+                        android:layout_width="wrap_content"
+                        android:layout_height="210dp"
+                        android:orientation="horizontal"
+                        android:layout_alignParentBottom="true">
 
-<!--                        <ImageView-->
-<!--                            android:layout_width="75dp"-->
-<!--                            android:src="@drawable/strings"-->
-<!--                            android:layout_height="190dp" />-->
-
-<!--&lt;!&ndash;                        <RelativeLayout&ndash;&gt;-->
-<!--&lt;!&ndash;                            android:layout_width="80dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                            android:layout_height="30dp">&ndash;&gt;-->
-
-<!--&lt;!&ndash;                        </RelativeLayout>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                        <RelativeLayout&ndash;&gt;-->
-<!--&lt;!&ndash;                            android:layout_below=""&ndash;&gt;-->
-<!--&lt;!&ndash;                            android:layout_width="80dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                            android:layout_height="30dp">&ndash;&gt;-->
-
-<!--&lt;!&ndash;                        </RelativeLayout>&ndash;&gt;-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/lad_1_1"-->
-<!--                            android:layout_width="30dp"-->
-<!--                            android:layout_height="30dp"-->
-<!--                            android:layout_marginStart="30dp"-->
-<!--                            android:layout_marginTop="160dp"-->
-<!--                            android:background="@drawable/note_standard"-->
-<!--                            android:paddingStart="7dp"-->
-<!--                            android:text="1"-->
-<!--                            android:textColor="#000"-->
-<!--                            android:textSize="20sp"-->
-<!--                            tools:ignore="RtlSymmetry" />-->
-
-<!--                        <LinearLayout-->
-<!--                            android:layout_width="75dp"-->
+<!--                        <FrameLayout-->
+<!--                            android:layout_width="wrap_content"-->
 <!--                            android:layout_height="190dp"-->
-<!--                            android:background="#806AA147"/>-->
+<!--                            android:layout_marginTop="10dp">-->
 
-<!--                    </FrameLayout>-->
+<!--                            <ImageView-->
+<!--                                android:layout_width="75dp"-->
+<!--                                android:src="@drawable/strings"-->
+<!--                                android:layout_height="190dp" />-->
 
-                </LinearLayout>
+<!--                            <TextView-->
+<!--                                android:id="@+id/lad_1_1"-->
+<!--                                android:layout_width="30dp"-->
+<!--                                android:layout_height="30dp"-->
+<!--                                android:layout_marginStart="30dp"-->
+<!--                                android:layout_marginTop="-10dp"-->
+<!--                                android:background="@drawable/note_standard"-->
+<!--                                android:paddingStart="7dp"-->
+<!--                                android:text="1"-->
+<!--                                android:textColor="#000"-->
+<!--                                android:textSize="20sp"-->
+<!--                                tools:ignore="RtlSymmetry" />-->
+
+<!--                            <LinearLayout-->
+<!--                                android:layout_width="75dp"-->
+<!--                                android:layout_height="190dp"-->
+<!--                                android:background="#806AA147"/>-->
+
+<!--                        </FrameLayout>-->
+
+                    </LinearLayout>
+                    <ImageView
+                        android:id="@+id/add_note"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_add"
+                        android:contentDescription="@string/todo"
+                        android:layout_toEndOf="@+id/strings"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="4dp"/>
+
+                </RelativeLayout>
             </HorizontalScrollView>
 
             <LinearLayout

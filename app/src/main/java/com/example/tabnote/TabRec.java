@@ -8,6 +8,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -36,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TabRec implements View.OnClickListener{
+public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
     public boolean reco = false;
 
@@ -49,8 +52,7 @@ public class TabRec implements View.OnClickListener{
     ImageView btnSave;
     ImageView btnBack;
     ImageView btnPlay;
-
-    TextView textView;
+    ImageView addTab;
 
     HorizontalScrollView scrollView;
 
@@ -65,20 +67,16 @@ public class TabRec implements View.OnClickListener{
     PlayNotes playNotes;
 
     int[] notesMargin = new int[] {
-            40, 120, 220, 300, 380, 470
-    };
-
-    int[] notesMarginTest = new int[] {
             2, 34, 66, 100, 130, 160
     };
 
     // начальное количество картинок грифа
     int countBegGriff;
-    // количество нарисованных сначало грифов
+    // количество нарисованных сначала грифов
     int countCurrGriff = 0;
 
     // частоты
-    // по вертикале - струны, по горизонтале - лады
+    // по вертикали - струны, по горизонтали - лады
     int[][] frequency = new int[][]{
             // 0  1    2    3    4    5    6    7    8    9    10   11   12
             {329, 349, 369, 391, 415, 440, 466, 494, 523, 554, 587, 622, 659},
@@ -117,6 +115,9 @@ public class TabRec implements View.OnClickListener{
     int imageWidth;
     int imageHeight;
 
+    ArrayList<Integer> freqListOld = new ArrayList<>();
+    ArrayList<Integer> valListOld = new ArrayList<>();
+
     @SuppressLint("HandlerLeak")
     public TabRec(Context context, String userName, View tabRoot) {
         this.context = context;
@@ -136,6 +137,7 @@ public class TabRec implements View.OnClickListener{
         btnSave = tabRoot.findViewById(R.id.btnSaveTab);
         btnPlay = tabRoot.findViewById(R.id.btnPlay);
         btnBack = tabRoot.findViewById(R.id.arrowBack);
+        addTab = tabRoot.findViewById(R.id.add_note);
 
         // get textView to show frequency
         frequencyText = tabRoot.findViewById(R.id.frequencyText);
@@ -159,6 +161,7 @@ public class TabRec implements View.OnClickListener{
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, thresholds);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setSelection(2);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -176,6 +179,7 @@ public class TabRec implements View.OnClickListener{
         btnClear.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
         btnBack.setOnClickListener(this);
+        addTab.setOnClickListener(this);
 
         // get spectrum fom audioReceiver
         Handler handler = new Handler() {
@@ -193,12 +197,14 @@ public class TabRec implements View.OnClickListener{
             }
         };
 
-        audioReciever = new AudioReciever(handler, context);
-
-        playNotes = new PlayNotes(context, notesFile, this.strings, btnPlay);
-
         imageWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75, context.getResources().getDisplayMetrics());
         imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 190, context.getResources().getDisplayMetrics());
+
+        countBegGriff = width / imageWidth;
+
+        audioReciever = new AudioReciever(handler, context);
+
+        playNotes = new PlayNotes(context, notesFile, this.strings, btnPlay, scrollView, countBegGriff);
 
         setBeginGriff();
 
@@ -211,10 +217,10 @@ public class TabRec implements View.OnClickListener{
     public void onClick(View v) {
         if (v.getTag(R.string.noteValue) != null) {
             int type = (int) v.getTag(R.string.noteType);
-            if (type == R.string.noteTypeStandard) {
-                updateNoteText(v);
-            }
-            else if (type == R.string.noteTypeUpdate) {
+//            if (type == R.string.noteTypeStandard) {
+//                updateNoteText(v);
+//            }
+            if (type == R.string.noteTypeUpdate) {
                 setUpdateNoteText(v);
             }
         }
@@ -311,7 +317,31 @@ public class TabRec implements View.OnClickListener{
                 }
                 break;
             }
+            case (R.id.add_note): {
+                if (!playNote) {
+                    if (reco) {
+                        Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
+                    } else {
+                        setNoteText(new int[]{0, 0}, "standard", null, 0);
+                    }
+                } else {
+                    Toast.makeText(context, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        if (v.getTag(R.string.noteValue) != null) {
+            int type = (int) v.getTag(R.string.noteType);
+            if (type == R.string.noteTypeStandard) {
+                updateNoteText(v);
+                return true;
+            }
+        }
+        return false;
     }
 
     private int[] getNote(LinkedHashMap<Integer, Integer> spectrumBig) {
@@ -500,18 +530,19 @@ public class TabRec implements View.OnClickListener{
 //                fr /= 2.8;
 //            }
 //        }
-
-        if (freqList.size() > 1) {
-            double cf = 50.0;
+        double ampl_freq_distance = 0;
+        if (freqList.size() > 1 && freqListOld.size() > 1) {
+            double cf = 3.0;
             double cp = 100.0;
 
             // если равно нулю, то не выводить
 
-            double ampl_freq_distance = Math.sqrt(Math.pow((freqList.get(0) - freqList.get(freqList.size()-1)) / cf, 2) +
-                    Math.pow((valList.get(0) - valList.get(valList.size()-1)) / cp, 2));
+            ampl_freq_distance = Math.sqrt(Math.pow((freqList.get(0) - freqListOld.get(0)) / cf, 2));
 
             System.out.println(ampl_freq_distance);
         }
+        freqListOld = freqList;
+        valListOld = valList;
 
         if (arrayList.size() > 0) {
             if (Collections.min(freqList) < 170) {
@@ -520,10 +551,10 @@ public class TabRec implements View.OnClickListener{
                 int zeroFr = arrayList.get(0);
 
 //                if (zeroFr >= 140 && zeroFr <= 148 ) System.out.println("RESULT: 4 СТРУНА ОТКРЫТЫЙ ЛАД");
-//                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");
+//                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");ц
 //                else if (zeroFr >= 150 && zeroFr <= 156 ) System.out.println("RESULT: 6 СТРУНА ОТКРЫТЫЙ ЛАД");
 
-//                fr /= 2.8;
+                fr /= 2.8;
             }
         }
 
@@ -538,13 +569,17 @@ public class TabRec implements View.OnClickListener{
                 return 0;
             } else {
                 countPickesSpectrums.clear();
-                return fr;
+                if (ampl_freq_distance > 1) {
+                    return fr;
+                }
             }
         } else {
             countPickesSpectrums.add(n_pickes);
-            return fr;
+            if (ampl_freq_distance > 1) {
+                return fr;
+            }
         }
-//        return 0;
+        return 0;
     }
 
     private void playNote() {
@@ -574,12 +609,12 @@ public class TabRec implements View.OnClickListener{
         linearLayout.setLayoutParams(layoutPlayParams);
         linearLayout.setBackgroundColor(Color.argb(0, 106, 161, 71));
 
-        int noteMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, notesMarginTest[note[0]], context.getResources().getDisplayMetrics());
+        int noteMargin = getPixelsFromDp(notesMargin[note[0]]);
 
 //        params.setMargins(80, notesMargin[note[0]],0,0);
         params.setMargins(80, noteMargin,0,0);
 
-        textView = new TextView(context);
+        TextView textView = new EditText(context);
         textView.setText(note[1]+"");
         textView.setGravity(Gravity.CENTER);
         textView.setTextColor(Color.BLACK);
@@ -588,6 +623,8 @@ public class TabRec implements View.OnClickListener{
         textView.setLayoutParams(params);
         textView.setTag(R.string.noteValue, (note[0]) + "_" + (note[1]));
 
+        textView.setCursorVisible(false);
+
         switch (type) {
             case "standard":
                 notesFile.add(new Note(note[0], note[1]));
@@ -595,7 +632,30 @@ public class TabRec implements View.OnClickListener{
                 textView.setBackground(context.getDrawable(R.drawable.note_standard));
                 textView.setTag(R.string.noteType, R.string.noteTypeStandard);
                 textView.setTag(R.string.noteID, notesFile.size() - 1);
+                textView.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_NORMAL);
                 textView.setOnClickListener(this);
+
+                textView.setOnLongClickListener(this);
+
+                textView.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String line = s.toString();
+                        if (!line.equals("")) {
+                            notesFile.set((Integer) textView.getTag(R.string.noteID), new Note(note[0], Integer.parseInt(line)));
+                            textView.setTag(R.string.noteValue, (note[0]) + "_" + (line));
+                            System.out.println(textView.getTag(R.string.noteValue));
+                            save = false;
+                        }
+                    }
+                });
 
                 if (countBegGriff != countCurrGriff) {
                     FrameLayout griff = (FrameLayout) strings.getChildAt(countCurrGriff);
@@ -609,15 +669,39 @@ public class TabRec implements View.OnClickListener{
                     strings.addView(griff);
                 }
 
-                scrollView.scrollTo(strings.getWidth(), 0);
+//                scrollView.scrollTo(strings.getWidth(), 0);
+//                scrollView.scrollTo(scrollView.getWidth(), 0);
+                scrollView.fullScroll(View.FOCUS_RIGHT);
                 break;
             case "update":
                 textView.setBackground(context.getDrawable(R.drawable.note_update));
                 textView.setTag(R.string.noteType, R.string.noteTypeUpdate);
                 textView.setTag(R.string.noteID, noteIndex);
+
+                textView.setFocusableInTouchMode(false);
+                textView.setCursorVisible(false);
+
                 textView.setOnClickListener(this);
 
                 parent.addView(textView);
+                save = false;
+                break;
+            case "delete":
+                textView.setText("");
+                LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                deleteParams.setMargins(80, getPixelsFromDp(-10),0,0);
+                textView.setLayoutParams(deleteParams);
+                textView.setBackground(context.getDrawable(R.drawable.note_update));
+                textView.setTag(R.string.noteType, "Delete");
+                textView.setTag(R.string.noteID, noteIndex);
+
+                textView.setFocusableInTouchMode(false);
+                textView.setCursorVisible(false);
+
+                textView.setOnClickListener(this);
+
+                parent.addView(textView);
+                save = false;
                 break;
             case "setUpdate":
                 notesFile.set(noteIndex, new Note(note[0], note[1]));
@@ -625,7 +709,34 @@ public class TabRec implements View.OnClickListener{
                 textView.setBackground(context.getDrawable(R.drawable.note_standard));
                 textView.setTag(R.string.noteType, R.string.noteTypeStandard);
                 textView.setTag(R.string.noteID, noteIndex);
+                textView.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_NORMAL);
                 textView.setOnClickListener(this);
+
+                textView.setOnLongClickListener(this);
+
+                textView.setEnabled(true);
+                textView.setCursorVisible(true);
+
+                textView.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String line = s.toString();
+                        if (!line.equals("")) {
+                            notesFile.set((Integer) textView.getTag(R.string.noteID), new Note(note[0], Integer.parseInt(line)));
+                            textView.setTag(R.string.noteValue, (note[0]) + "_" + (line));
+                            System.out.println(textView.getTag(R.string.noteValue));
+                            save = false;
+                            textView.setCursorVisible(false);
+                        }
+                    }
+                });
 
                 parent.addView(textView);
                 parent.addView(linearLayout);
@@ -650,7 +761,6 @@ public class TabRec implements View.OnClickListener{
 
     private void setBeginGriff() {
         // создание первоначального грифа
-        countBegGriff = width / imageWidth;
 
         for (int i = 0; i < countBegGriff; i++) {
             FrameLayout griff = drawGriff();
@@ -664,6 +774,7 @@ public class TabRec implements View.OnClickListener{
 
         String tag = (String) note.getTag(R.string.noteValue);
         int noteIndex = (int) note.getTag(R.string.noteID);
+        System.out.println(tag);
         String[] noteTag = tag.split("_");
         int noteString = Integer.parseInt(noteTag[0]);
         int noteFret = Integer.parseInt(noteTag[1]);
@@ -672,7 +783,9 @@ public class TabRec implements View.OnClickListener{
             parent.removeViewAt(1);
         }
 
-        for (int i = 0; i < notesMarginTest.length; i++) {
+        setNoteText(new int[]{0, noteFret}, "delete", parent, noteIndex);
+
+        for (int i = 0; i < notesMargin.length; i++) {
             setNoteText(new int[]{i, noteFret}, "update", parent, noteIndex);
         }
     }
@@ -833,5 +946,9 @@ public class TabRec implements View.OnClickListener{
                 break;
             }
         }
+    }
+
+    private int getPixelsFromDp(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 }

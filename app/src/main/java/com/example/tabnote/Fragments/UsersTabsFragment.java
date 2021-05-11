@@ -54,7 +54,7 @@ public class UsersTabsFragment extends Fragment {
 
         TextView internetConnection = view.findViewById(R.id.no_internet_users);
 
-        usersTabsAdapter = new UsersTabsAdapter(tabList, userName);
+        usersTabsAdapter = new UsersTabsAdapter(tabList, userName, view.getContext());
         usersTabsList.setAdapter(usersTabsAdapter);
         usersTabsList.setLayoutManager(new LinearLayoutManager(view.getContext()));
 

@@ -116,6 +116,9 @@ public class ServerMessages {
                         else if (error.contains("Invalid password")) {
                             message = "Неправильный пароль";
                         }
+                        else if (error.contains("must be more than 4 and less than 10 characters")) {
+                            message = "Пароль должен быть от 4 до 10 символов";
+                        }
                         if (!message.equals("")) Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
                         System.out.println(error);

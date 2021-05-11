@@ -8,17 +8,19 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class PlayNotes {
-    private MediaPlayer mediaPlayer;
+    private final MediaPlayer mediaPlayer;
 
-    private Context context;
+    private final Context context;
 
     private int currentIndexNote;
 
@@ -30,14 +32,22 @@ public class PlayNotes {
     private FrameLayout stringCurrent;
     private ImageView btnPlay;
 
+    private HorizontalScrollView scrollView;
+
     Bitmap imagePlay;
     Bitmap imagePause;
 
-    PlayNotes(Context context, ArrayList<Note> notes, LinearLayout strings, ImageView btnPlay) {
+    private int countBegGriff;
+
+    PlayNotes(Context context, ArrayList<Note> notes, LinearLayout strings, ImageView btnPlay, HorizontalScrollView scrollView,
+              int countBegGriff) {
         this.context = context;
         this.notes = notes;
         this.strings = strings;
         this.btnPlay = btnPlay;
+        this.countBegGriff = countBegGriff;
+
+        this.scrollView = scrollView;
 
         mediaPlayer = new MediaPlayer();
 
@@ -136,6 +146,14 @@ public class PlayNotes {
         mediaPlayer.start();
 
         stringCurrent = (FrameLayout) strings.getChildAt(currentIndexNote);
+
+        if (currentIndexNote == 0) {
+            scrollView.smoothScrollTo(0, 0);
+        }
+
+        if (currentIndexNote + 1 >= countBegGriff) {
+            scrollView.smoothScrollTo(currentIndexNote * stringCurrent.getWidth(), 0);
+        }
 
         stringCurrent.getChildAt(2).setBackgroundColor(Color.argb(60, 106, 161, 71));
     }

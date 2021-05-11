@@ -15,11 +15,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tabnote.TabPreview;
 import com.example.tabnote.database.DBManager;
 import com.example.tabnote.R;
 import com.example.tabnote.ServerCommunication.ServerMessages;
 import com.example.tabnote.ServerCommunication.Tab;
 import com.example.tabnote.TabActivity;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -75,6 +78,15 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
 
         tabShare.setTag(R.string.userTabShare, position);
         tabShare.setOnClickListener(this);
+
+        String jsonText = dbManager.getTab(tabName);
+
+        TabPreview tabPreview = new TabPreview(context, view);
+        try {
+            tabPreview.readJSONFile(jsonText);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         cardsView.add(view);
     }

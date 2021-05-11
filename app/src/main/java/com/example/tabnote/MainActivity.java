@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Button btnUserLogin;
 
-    TextView userTitleType;
+//    TextView userTitleType;
     TextView userNameView;
 
     UserFragment userFragment;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         bottomMenu = findViewById(R.id.bottom_menu);
 
-        userTitleType = findViewById(R.id.user_title_type);
+//        userTitleType = findViewById(R.id.user_title_type);
         userNameView = findViewById(R.id.user_name);
 
         topMenuUser = findViewById(R.id.topMenuUser);
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_users_tabs:
                 activeMenuItem(btnUsersTabs);
 
-                userTitleType.setText("Табулатуры пользователей");
+//                userTitleType.setText("Табулатуры пользователей");
 
                 changeFragment(getFragmentManager().beginTransaction(), usersTabsFragment);
                 break;
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_home:
                 activeMenuItem(btnHome);
 
-                userTitleType.setText("Ваши табулатуры");
+//                userTitleType.setText("Ваши табулатуры");
 
                 changeFragment(getFragmentManager().beginTransaction(), userFragment);
                 break;
