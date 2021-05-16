@@ -105,8 +105,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
     DBManager dbManager;
 
-    ArrayList<Integer> countPickesSpectrums = new ArrayList<>();
-
     String userName;
 
     String[] thresholds = new String[] {"400000", "500000", "600000", "700000"};
@@ -114,9 +112,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
     int imageWidth;
     int imageHeight;
-
-    ArrayList<Integer> freqListOld = new ArrayList<>();
-    ArrayList<Integer> valListOld = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
     public TabRec(Context context, String userName, View tabRoot) {
@@ -162,17 +157,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setSelection(2);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                threshold = thresholds[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         btnMicrophone.setOnClickListener(this);
         btnSave.setOnClickListener(this);
@@ -185,10 +169,10 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         Handler handler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 // получаем ноту по частоте, переданной из детектора
-                LinkedHashMap<Integer, Integer> spectrum = (LinkedHashMap<Integer, Integer>) msg.obj;
+                double maxFreq = (double) msg.obj;
 //                double[] spectrum = (double[]) msg.obj;
 
-                int[] note = getNote(spectrum);
+                int[] note = getNote(maxFreq);
 
                 // если распознано, то добавляем на струну
                 if (note[0] >= 0 && note[1] >= 0) {
@@ -202,7 +186,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
         countBegGriff = width / imageWidth;
 
-        audioReciever = new AudioReciever(handler, context);
+        audioReciever = new AudioReciever(handler, context, spinner, thresholds);
 
         playNotes = new PlayNotes(context, notesFile, this.strings, btnPlay, scrollView, countBegGriff);
 
@@ -232,11 +216,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
                         // если пауза
                         reco = false;
                         btnMicrophone.setImageBitmap(noMicrophoneImage);
-                        try {
-                            audioReciever.stop();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        audioReciever.stop();
                     } else {
                         // если старт
                         reco = true;
@@ -300,11 +280,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
             case (R.id.arrowBack): {
                 btnMicrophone.setImageBitmap(microphoneImage);
                 if (reco) {
-                    try {
-                        audioReciever.stop();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    audioReciever.stop();
                 }
                 reco = false;
 
@@ -344,7 +320,8 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         return false;
     }
 
-    private int[] getNote(LinkedHashMap<Integer, Integer> spectrumBig) {
+    @SuppressLint("SetTextI18n")
+    private int[] getNote(double freq) {
 //    private int[] getNote(double[] spectrum) {
         // получение ноты
 
@@ -392,37 +369,10 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
          */
 
-
-        LinkedHashMap<Integer, Integer> spectrum = new LinkedHashMap<>();
-        for (Integer key: spectrumBig.keySet()) {
-            if (key >= 1001) break;
-            spectrum.put(key, spectrumBig.get(key));
-        }
-
-        double freq = 0;
-        freq = getMaxIndex(spectrum);
         frequencyText.setText("Frequency: " + freq);
 
 //        System.out.println("result freq: " + freq);
 //        System.out.println("length of spectrum: " + spectrum.size());
-
-        LinkedHashMap<Integer, Integer> finalSpectrum = spectrum;
-        double finalFreq = freq;
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                try {
-//                    FileOutputStream out = context.openFileOutput("spectrum" + finalFreq + ".txt", Context.MODE_PRIVATE);
-//                    PrintWriter write = new PrintWriter(out);
-//                    for (Integer key: spectrum.keySet()) {
-//                        write.println(key + " " + spectrum.get(key));
-//                    }
-//                    write.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }.start();
 
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {
@@ -455,132 +405,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         return new int[] {-1, -1};
     }
 
-    private double calculateAverage(List <Integer> marks) {
-        Integer sum = 0;
-        if(!marks.isEmpty()) {
-            for (Integer mark : marks) {
-                sum += mark;
-            }
-            return sum.doubleValue() / marks.size();
-        }
-        return sum;
-    }
-
-    public double getMaxIndex(LinkedHashMap<Integer, Integer> spectrum) {
-        double fr = 0;
-        double maxx = 0;
-        int n_pickes = 0;
-
-        ArrayList<Integer> arrayList = new ArrayList<>();
-
-//        int ind = 0;
-//
-//        for (Integer val: spectrum.values()) {
-//            if (ind > spectrum.size() / 2) break;
-//            if (val > maxx) {
-//                maxx = val;
-//                fr = ind;
-//                n_pickes ++;
-//            }
-//            ind ++;
-//            if (val > 200000) {
-//                arrayList.add(ind);
-//            }
-//        }
-//        fr = fr * 24000 / spectrum.size();
-
-        Set set = spectrum.entrySet();
-        ArrayList<Integer> valList = new ArrayList<>();
-        ArrayList<Integer> freqList = new ArrayList<>();
-        int ind = 0;
-        for (Object o : set) {
-            Map.Entry item = (Map.Entry) o;
-            int freq = (int) item.getKey();
-            int val = (int) item.getValue();
-
-            if (freq < 1500) {
-                if (val > maxx && val > Integer.parseInt(threshold)) {
-                    maxx = val;
-                    fr = freq;
-                    n_pickes ++;
-                }
-            }
-
-            if (val > Integer.parseInt(threshold)) {
-                arrayList.add(freq);
-                if (ind <= 6) {
-                    freqList.add(freq);
-                    valList.add(val);
-                }
-                ind ++;
-            }
-//            if (n_pickes > 25 || n_pickes < 15) break;
-        }
-
-
-//        System.out.println("pickes: " + n_pickes);
-//        System.out.println(arrayList + " > " + threshold);
-
-//        System.out.println("max freq: " + freqList);
-//        System.out.println("max val: " + valList);
-
-//        if (arrayList.size() > 0) {
-//            if (arrayList.get(0) < 160) {
-//                System.out.println("fr: " + fr);
-//                fr /= 2.8;
-//            }
-//        }
-        double ampl_freq_distance = 0;
-        if (freqList.size() > 1 && freqListOld.size() > 1) {
-            double cf = 3.0;
-            double cp = 100.0;
-
-            // если равно нулю, то не выводить
-
-            ampl_freq_distance = Math.sqrt(Math.pow((freqList.get(0) - freqListOld.get(0)) / cf, 2));
-
-            System.out.println(ampl_freq_distance);
-        }
-        freqListOld = freqList;
-        valListOld = valList;
-
-        if (arrayList.size() > 0) {
-            if (Collections.min(freqList) < 170) {
-//                System.out.println("fr: " + fr);
-
-                int zeroFr = arrayList.get(0);
-
-//                if (zeroFr >= 140 && zeroFr <= 148 ) System.out.println("RESULT: 4 СТРУНА ОТКРЫТЫЙ ЛАД");
-//                else if (zeroFr >= 100 && zeroFr <= 110 ) System.out.println("RESULT: 5 СТРУНА ОТКРЫТЫЙ ЛАД");ц
-//                else if (zeroFr >= 150 && zeroFr <= 156 ) System.out.println("RESULT: 6 СТРУНА ОТКРЫТЫЙ ЛАД");
-
-                fr /= 2.8;
-            }
-        }
-
-//        System.out.println("average freq: " + calculateAverage(freqList));
-
-//        fr = arrayList.get(0);
-//        boolean filterPickes = n_pickes > 25 || n_pickes < 15;
-        // 16 9 7 6
-        if (countPickesSpectrums.size() > 0) {
-            if (n_pickes < countPickesSpectrums.get(countPickesSpectrums.size()-1)) {
-                countPickesSpectrums.add(n_pickes);
-                return 0;
-            } else {
-                countPickesSpectrums.clear();
-                if (ampl_freq_distance > 1) {
-                    return fr;
-                }
-            }
-        } else {
-            countPickesSpectrums.add(n_pickes);
-            if (ampl_freq_distance > 1) {
-                return fr;
-            }
-        }
-        return 0;
-    }
 
     private void playNote() {
         playNotes.setNotes(notesFile, strings);

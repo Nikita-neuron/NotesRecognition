@@ -1,9 +1,11 @@
 package com.example.tabnote;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -13,18 +15,26 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.app.Fragment;
 import android.widget.TextView;
 
 import com.example.tabnote.Fragments.UserFragment;
 import com.example.tabnote.Fragments.UsersTabsFragment;
 import com.example.tabnote.database.DBUserManager;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_AUDIO_RECORD = 2;
 
     RelativeLayout fragmentsChange;
     RelativeLayout btnUsersTabs;
@@ -52,9 +62,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // проверка разрешений
+        // запись с микрофона
+        int permissionStatusAudio = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        // запись файлов
+        int permissionStatusStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permissionStatusAudio != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO},
+                    REQUEST_AUDIO_RECORD);
+        }
+
+        if (permissionStatusStorage != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_AUDIO_RECORD);
+        }
+
         dbUserManager = DBUserManager.getInstance(this);
 
-        userName = getIntent().getExtras().getString("userName");
+        try {
+            userName = getIntent().getExtras().getString("userName");
+        } catch (NullPointerException e) {
+            userName = "none";
+        }
+
+        if (userName.equals("none")) {
+
+            String user = dbUserManager.existUser();
+
+            if (!user.equals("")) {
+                userName = user;
+            }
+        }
 
         fragmentsChange = findViewById(R.id.fragmentsChange);
 
@@ -181,10 +221,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.userLogout) {
             dbUserManager.deleteUser(userName);
-            Intent intent = new Intent(this, StartActivity.class);
-            startActivity(intent);
+            topMenuUser.setVisibility(View.INVISIBLE);
+            userLogin.setVisibility(View.VISIBLE);
+
+            btnUserLogin = findViewById(R.id.btn_user_login);
+            btnUserLogin.setOnClickListener(this);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // проверка ответа пользователя по разрешениям
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_EXTERNAL_STORAGE) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Предоставляет дополнительную информацию, если разрешение
+                // не было дано, а пользователь должен получить разъяснения
+                Snackbar.make(fragmentsChange, "Без данного разрешения, вы не сможете сохранять и читать табулатуры", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("OK", view -> ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                REQUEST_EXTERNAL_STORAGE)).show();
+            }
+
+        } else if (requestCode == REQUEST_AUDIO_RECORD){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.RECORD_AUDIO)) {
+                // Предоставляет дополнительную информацию, если разрешение
+                // не было дано, а пользователь должен получить разъяснения
+                Snackbar.make(fragmentsChange, "Без данного разрешения, приложение не сможет распозновать ноты", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("OK", view -> ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_AUDIO_RECORD)).show();
+            }
+        }
     }
 }

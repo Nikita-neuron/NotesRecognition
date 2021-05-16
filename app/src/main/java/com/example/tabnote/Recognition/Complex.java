@@ -2,9 +2,6 @@ package com.example.tabnote.Recognition;
 
 import android.util.Log;
 
-/**
- * Created by alexey on 08.01.16.
- */
 public class Complex {
     /******************************************************************************
      * Compilation:  javac Complex.java
@@ -44,9 +41,7 @@ public class Complex {
         im = imag;
     }
 
-    public Complex() {
-
-    }
+    public Complex() { }
 
     // return a string representation of the invoking Complex object
     public String toString() {
@@ -144,12 +139,10 @@ public class Complex {
 
     // return a new Complex object whose value is the complex tangent of this
     public Complex tan() {
-
         return sin().divides(cos());
     }
 
     public Complex ctg() {
-
         return cos().divides(sin());
     }
 
@@ -158,36 +151,14 @@ public class Complex {
         return new Complex(e * Math.cos(im), e * Math.sin(im));
     }
 
-    final Object b = "";
-    boolean worked = false;
-
-    public Complex[] realToComplex(short arr[]) {
+    public Complex[] realToComplex(short[] arr) {
         Complex[] complex = new Complex[arr.length];
         try {
+            int second_block = arr.length;
 
-
-//        int first_block = arr.length / 3;
-        int second_block = arr.length;
-//        new Thread(() -> {
-//                worked = false;
-//                for (int i = 0; i < first_block; i++) {
-//                    complex[i] = new Complex(arr[i], 0);
-//                }
-//                worked = true;
-//        }).start();
-
-        for (int i = 0; i < second_block; i++) {
-            complex[i] = new Complex(arr[i], 0);
-        }
-
-//        while(!worked){
-//            try {
-//                Thread.sleep(10);
-////                    Log.i("FFT","sleeping");
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+            for (int i = 0; i < second_block; i++) {
+                complex[i] = new Complex(arr[i], 0);
+            }
         } catch (Exception e) {
             Log.e("Complex", e.toString());
         }

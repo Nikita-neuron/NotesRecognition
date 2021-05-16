@@ -78,11 +78,7 @@ public class TabActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             btnMicrophone.setImageBitmap(microphoneImage);
             if (tabRec.reco) {
-                try {
-                    tabRec.audioReciever.stop();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                tabRec.audioReciever.stop();
             }
             tabRec.reco = false;
 
@@ -103,11 +99,7 @@ public class TabActivity extends AppCompatActivity {
         // press on back button
         btnMicrophone.setImageBitmap(noMicrophoneImage);
         if (tabRec.reco) {
-            try {
-                tabRec.audioReciever.stop();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            tabRec.audioReciever.stop();
         }
         tabRec.reco = false;
 
