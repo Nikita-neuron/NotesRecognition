@@ -32,8 +32,6 @@ public class TabPreview {
 
     // начальное количество картинок грифа
     int countBegGriff;
-    // количество нарисованных сначала грифов
-    int countCurrGriff = 0;
 
     LinearLayout strings;
 

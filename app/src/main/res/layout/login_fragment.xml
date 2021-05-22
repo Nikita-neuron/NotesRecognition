@@ -24,10 +24,11 @@
             android:textColorHint="#6F6F6F"
             android:textSize="30sp"
             android:background="@drawable/ic_edittext_login"
-            android:hint="Имя"
+            android:hint="@string/nameText"
             android:textColor="#000"
             android:inputType="text"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/editTextInPassword"
@@ -40,10 +41,11 @@
             android:textSize="30sp"
             android:background="@drawable/ic_edittext_login"
             android:textColor="#000"
-            android:hint="Пароль"
+            android:hint="@string/passwordText"
             android:inputType="textPassword"
             tools:ignore="TextFields"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/btn_login"
@@ -54,7 +56,7 @@
             android:layout_marginBottom="22dp"
             android:textColor="#323B3D"
             android:textSize="30sp"
-            android:text="Войти"/>
+            android:text="@string/logIn"/>
 
         <TextView
             android:id="@+id/signUp"
@@ -62,7 +64,7 @@
             android:layout_height="wrap_content"
             android:textColor="#4E4E4E"
             android:textSize="18sp"
-            android:text="Создать аккаунт"/>
+            android:text="@string/createAccText"/>
 
     </LinearLayout>
 

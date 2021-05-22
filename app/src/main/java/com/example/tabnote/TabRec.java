@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -15,7 +16,6 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -33,11 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
@@ -52,11 +47,8 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
     ImageView btnSave;
     ImageView btnBack;
     ImageView btnPlay;
-    ImageView addTab;
 
     HorizontalScrollView scrollView;
-
-    TextView frequencyText;
 
     LinearLayout strings;
 
@@ -107,8 +99,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
     String userName;
 
-    String[] thresholds = new String[] {"400000", "500000", "600000", "700000"};
-    String threshold = "600000";
+    String[] thresholds = new String[] {"4", "5", "6", "7", "8", "9"};
 
     int imageWidth;
     int imageHeight;
@@ -127,15 +118,11 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         height = displaymetrics.heightPixels;
 
         // find clear, microphone, save and play  buttons
-        btnClear = tabRoot.findViewById(R.id.btnClear);;
+        btnClear = tabRoot.findViewById(R.id.btnClear);
         btnMicrophone = tabRoot.findViewById(R.id.btnPausePlay);
         btnSave = tabRoot.findViewById(R.id.btnSaveTab);
         btnPlay = tabRoot.findViewById(R.id.btnPlay);
         btnBack = tabRoot.findViewById(R.id.arrowBack);
-        addTab = tabRoot.findViewById(R.id.add_note);
-
-        // get textView to show frequency
-        frequencyText = tabRoot.findViewById(R.id.frequencyText);
 
         // images microphone and no microphone
         microphoneImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.microphone);
@@ -163,10 +150,9 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         btnClear.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
         btnBack.setOnClickListener(this);
-        addTab.setOnClickListener(this);
 
         // get spectrum fom audioReceiver
-        Handler handler = new Handler() {
+        Handler handler = new Handler(Looper.getMainLooper()) {
             public void handleMessage(android.os.Message msg) {
                 // получаем ноту по частоте, переданной из детектора
                 double maxFreq = (double) msg.obj;
@@ -201,9 +187,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
     public void onClick(View v) {
         if (v.getTag(R.string.noteValue) != null) {
             int type = (int) v.getTag(R.string.noteType);
-//            if (type == R.string.noteTypeStandard) {
-//                updateNoteText(v);
-//            }
             if (type == R.string.noteTypeUpdate) {
                 setUpdateNoteText(v);
             }
@@ -235,7 +218,9 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
                     } else {
-                        createDialog("writeFile", "");
+                        if (notesFile.size() > 0) {
+                            createDialog("writeFile", "");
+                        }
                     }
                 } else {
                     Toast.makeText(context, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
@@ -249,12 +234,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
                     if (reco) {
                         Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
                     } else {
-//                        btnMicrophone.setImageBitmap(noMicrophoneImage);
-//                        try {
-//                            audioReciever.stop();
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
                         createDialog("clear", "");
                     }
                 } else {
@@ -278,30 +257,23 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
             }
 
             case (R.id.arrowBack): {
-                btnMicrophone.setImageBitmap(microphoneImage);
+                btnMicrophone.setImageBitmap(noMicrophoneImage);
                 if (reco) {
                     audioReciever.stop();
                 }
                 reco = false;
 
                 if (!save) {
-                    createDialog("back", "");
+                    if (notesFile.size() > 0) {
+                        createDialog("back", "");
+                    }
+                    Intent in = new Intent(context, MainActivity.class);
+                    in.putExtra("userName", userName);
+                    context.startActivity(in);
                 } else {
                     Intent in = new Intent(context, MainActivity.class);
                     in.putExtra("userName", userName);
                     context.startActivity(in);
-                }
-                break;
-            }
-            case (R.id.add_note): {
-                if (!playNote) {
-                    if (reco) {
-                        Toast.makeText(context, "Остановите запись", Toast.LENGTH_LONG).show();
-                    } else {
-                        setNoteText(new int[]{0, 0}, "standard", null, 0);
-                    }
-                } else {
-                    Toast.makeText(context, "Остановите воспроизведение", Toast.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -322,83 +294,17 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
     @SuppressLint("SetTextI18n")
     private int[] getNote(double freq) {
-//    private int[] getNote(double[] spectrum) {
         // получение ноты
-
-        /* find the peak magnitude and it's index */
-        /*
-        double maxMag = Double.NEGATIVE_INFINITY;
-        int maxInd = -1;
-        for (int i = 0; i < spectrum.length / 2; ++i) {
-            double re = spectrum[2 * i];
-            double im = spectrum[2 * i + 1];
-            double mag = Math.sqrt(re * re + im * im);
-//            double mag = a[i];
-            // ограничить по частоте                        <--
-//            Log.d("freq", "mag: " + mag + " freq: " + (int) 12000 * i / (spectrum.length / 2));
-            if (mag > maxMag) {
-                maxMag = mag;
-                maxInd = i;
-            }
-        }
-        int freq = (int) 24000 * maxInd / (spectrum.length / 2);
-        frequencyText.setText("Frequency: " + freq);
-        System.out.println(freq+"");
-
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    FileOutputStream out = context.openFileOutput("spectrum" + freq + ".txt", Context.MODE_PRIVATE);
-                    PrintWriter write = new PrintWriter(out);
-                    for (int i = 0; i < spectrum.length / 2; ++i) {
-                        double re = spectrum[2 * i];
-                        double im = spectrum[2 * i + 1];
-                        double mag = Math.sqrt(re * re + im * im);
-
-                        double freq = 24000 * i / (spectrum.length / 2);
-
-                        write.println(freq + " " + mag);
-                    }
-                    write.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-
-         */
-
-        frequencyText.setText("Frequency: " + freq);
-
-//        System.out.println("result freq: " + freq);
-//        System.out.println("length of spectrum: " + spectrum.size());
-
         for(int i = 0; i<frequency.length; i++) {
             for(int j = 0; j<frequency[i].length; j++) {
                 // если частота совпадает с погрешностью, то возвращаем
                 // i - струна
                 // j - лад
-                double crat = freq / frequency[i][j];
-                double crat_freq = freq / crat;
-//                System.out.println("crat: " + crat);
                 if(freq >= frequency[i][j] - er && freq <= frequency[i][j] + er) {
-
                     return new int[]{i, j};
                 }
-//                else {
-//                    for (int k = 2; k <= 10; k++) {
-//                        if (freq / k == frequency[i][j]) {
-//                            System.out.println("crat_freq: " + crat_freq);
-//                            return new int[] {i, j};
-//                        }
-//                    }
-//                }
             }
         }
-//        return (int) Math.round(f);
-//        return (int) f
-
         save = false;
 
         // если не совпадает, то возвращаем -1
@@ -435,7 +341,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
         int noteMargin = getPixelsFromDp(notesMargin[note[0]]);
 
-//        params.setMargins(80, notesMargin[note[0]],0,0);
         params.setMargins(80, noteMargin,0,0);
 
         TextView textView = new EditText(context);
@@ -492,9 +397,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
                     griff.addView(linearLayout);
                     strings.addView(griff);
                 }
-
-//                scrollView.scrollTo(strings.getWidth(), 0);
-//                scrollView.scrollTo(scrollView.getWidth(), 0);
                 scrollView.fullScroll(View.FOCUS_RIGHT);
                 break;
             case "update":
@@ -600,7 +502,6 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
         int noteIndex = (int) note.getTag(R.string.noteID);
         System.out.println(tag);
         String[] noteTag = tag.split("_");
-        int noteString = Integer.parseInt(noteTag[0]);
         int noteFret = Integer.parseInt(noteTag[1]);
 
         while (parent.getChildCount() > 1) {
@@ -728,12 +629,8 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
 
                 builder.setTitle("Данный файл уже существует");
                 builder.setMessage("Вы хотите его перезаписать?");
-                builder.setNegativeButton("Нет", (dialog, which) -> {
-                    createDialog("writeFile", lastName);
-                });
-                builder.setPositiveButton("Да", (dialog, which) -> {
-                    writeFile(lastName, true);
-                });
+                builder.setNegativeButton("Нет", (dialog, which) -> createDialog("writeFile", lastName));
+                builder.setPositiveButton("Да", (dialog, which) -> writeFile(lastName, true));
 
                 builder.show();
                 break;
@@ -748,9 +645,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
                     in.putExtra("userName", userName);
                     context.startActivity(in);
                 });
-                builder.setPositiveButton("Да", (dialog, which) -> {
-                    createDialog("writeFile", "");
-                });
+                builder.setPositiveButton("Да", (dialog, which) -> createDialog("writeFile", ""));
 
                 builder.show();
                 break;
@@ -762,9 +657,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
                 builder.setMessage("Все изменения будут потеряны");
 
                 builder.setNegativeButton("Нет", (dialog, which) -> { });
-                builder.setPositiveButton("Да", (dialog, which) -> {
-                    stopRec();
-                });
+                builder.setPositiveButton("Да", (dialog, which) -> stopRec());
 
                 builder.show();
                 break;

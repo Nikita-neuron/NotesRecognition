@@ -1,7 +1,8 @@
 package com.example.tabnote.Fragments;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.annotation.SuppressLint;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -73,6 +74,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener{
         fragmentTransaction.commit();
     }
 
+    @SuppressLint("CommitTransaction")
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_login) {
@@ -89,6 +91,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener{
             }
         }
         else if (v.getId() == R.id.signUp) {
+            assert getFragmentManager() != null;
             changeFragment(getFragmentManager().beginTransaction(), new SignUpFragment());
         }
     }

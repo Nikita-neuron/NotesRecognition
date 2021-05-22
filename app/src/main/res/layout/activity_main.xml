@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,20 +21,28 @@
         android:layout_height="wrap_content">
 
 <!--        <TextView-->
-<!--            android:id="@+id/user_title_type"-->
+<!--            android:id="@+id/tab_info"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
-<!--            android:background="@drawable/ic_background_title"-->
+<!--            android:background="@drawable/ic_background_user_login"-->
 <!--            android:gravity="center"-->
 <!--            android:textSize="18sp"-->
 <!--            android:textColor="#000"-->
-<!--            android:text="Ваши табулатуры"/>-->
+<!--            android:text="INFO"/>-->
+
+        <ImageView
+            android:id="@+id/tab_info"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_info"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/topMenu"
             android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:ignore="RelativeOverlap,UselessParent">
 
             <RelativeLayout
                 android:id="@+id/topMenuUser"
@@ -55,8 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="18sp"
-                    android:textColor="#000"
-                    android:text="User"/>
+                    android:textColor="#000"/>
 
             </RelativeLayout>
 
@@ -72,7 +80,7 @@
                     app:backgroundTint="@null"
                     android:background="@drawable/ic_background_user_login"
                     android:textColor="#323B3D"
-                    android:text="Войти"/>
+                    android:text="@string/logIn"/>
 
             </RelativeLayout>
 
@@ -81,6 +89,7 @@
     </RelativeLayout>
 
     <ImageView
+        android:id="@+id/main_icon"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/user_main_header"
         android:src="@mipmap/ic_launcher"
@@ -110,7 +119,8 @@
         <RelativeLayout
             android:id="@+id/btn_users_tabs"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:ignore="RelativeOverlap">
 
             <ImageView
                 android:id="@+id/users_tabs_icon"
@@ -126,7 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
-                android:text="Табулатуры"/>
+                android:text="@string/tabsMenu"/>
 
         </RelativeLayout>
 
@@ -134,7 +144,8 @@
             android:id="@+id/btn_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:layout_centerInParent="true"
+            tools:ignore="RelativeOverlap">
 
             <ImageView
                 android:id="@+id/home_icon"
@@ -150,7 +161,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
-                android:text="Главная"/>
+                android:text="@string/mainMenu"/>
 
         </RelativeLayout>
 
@@ -159,7 +170,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            tools:ignore="RelativeOverlap">
 
             <ImageView
                 android:id="@+id/user_add_icon"
@@ -175,7 +187,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
-                android:text="Добавить"/>
+                android:text="@string/addMenu"/>
 
         </RelativeLayout>
 

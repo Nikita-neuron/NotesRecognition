@@ -4,9 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,7 +21,7 @@ public class UserFragment extends Fragment {
 
     RecyclerView userTabs;
 
-    TextView noTabs;
+    RelativeLayout noTabs;
 
     DBManager dbManager;
 
@@ -37,6 +37,7 @@ public class UserFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_fragment, container, false);
 
+        assert getArguments() != null;
         userName = getArguments().getString("userName");
 
         dbManager = DBManager.getInstance(view.getContext());

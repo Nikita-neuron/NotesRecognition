@@ -3,10 +3,14 @@ package com.example.tabnote.ServerCommunication;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import com.example.tabnote.Adapters.UsersTabsAdapter;
+import com.example.tabnote.TabComparator;
 import com.example.tabnote.database.DBUserManager;
 import com.example.tabnote.MainActivity;
 import com.google.gson.Gson;
@@ -155,6 +159,7 @@ public class ServerMessages {
         Call<List<Tab>> callAsync = service.getTabs();
 
         callAsync.enqueue(new Callback<List<Tab>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call<List<Tab>> call, Response<List<Tab>> response) {
 
@@ -179,6 +184,8 @@ public class ServerMessages {
                 progressBar.setVisibility(ProgressBar.INVISIBLE);
 
                 List<Tab> tabs = response.body();
+                assert tabs != null;
+                tabs.sort(new TabComparator().sortByName());
                 usersTabsAdapter.swap(tabs);
             }
 

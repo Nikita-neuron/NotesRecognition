@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,12 +35,12 @@ public class UserTabsAdapter extends RecyclerView.Adapter<UserTabsAdapter.ViewHo
     DBManager dbManager;
 
     Context context;
-    TextView noTabs;
+    RelativeLayout noTabs;
 
     // массив карточек
     ArrayList<View> cardsView = new ArrayList<>();
 
-    public UserTabsAdapter(ArrayList<String> tabArrayList, Context context, TextView noTabs, String userName) {
+    public UserTabsAdapter(ArrayList<String> tabArrayList, Context context, RelativeLayout noTabs, String userName) {
         this.tabArrayList = tabArrayList;
         this.context = context;
         this.noTabs = noTabs;

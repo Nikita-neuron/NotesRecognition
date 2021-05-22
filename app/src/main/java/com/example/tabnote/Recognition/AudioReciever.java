@@ -31,7 +31,7 @@ public class AudioReciever{
 
     private boolean running = false;
 
-    String threshold = "600000";
+    String threshold = "6";
     String[] thresholds;
 
     ArrayList<Integer> freqListOld = new ArrayList<>();
@@ -67,18 +67,15 @@ public class AudioReciever{
 
     public void stop() {
         running = false;
-//        Rthread.join();
-//        Rthread.interrupt();
     }
 
     protected void loopback() {
 
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
 //        final int bufferSize = 16384;
-        final int bufferSize = 8192;
-//        final int bufferSize = AudioRecord.getMinBufferSize(freq,
-//                AudioFormat.CHANNEL_CONFIGURATION_MONO,
-//                AudioFormat.ENCODING_PCM_16BIT);
+//        final int bufferSize = 8192;
+        final int bufferSize = 4096;
+//        final int bufferSize = 2048;
 
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, freq,
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
@@ -238,7 +235,6 @@ public class AudioReciever{
                     handler.sendMessage(handler.obtainMessage(2, maxFreq));
 //                    handler.sendMessage(handler.obtainMessage(2, res));
 //                    Log.d("data", res+"");
-
                 } catch (Throwable t) {
                     Log.d("Error", "Read write failed");
                     t.printStackTrace();
@@ -299,14 +295,14 @@ public class AudioReciever{
             int val = (int) item.getValue();
 
             if (freq < 1500) {
-                if (val > maxx && val > Integer.parseInt(threshold)) {
+                if (val > maxx && val > (Integer.parseInt(threshold)*100000)) {
                     maxx = val;
                     fr = freq;
                     n_pickes ++;
                 }
             }
 
-            if (val > Integer.parseInt(threshold)) {
+            if (val > (Integer.parseInt(threshold)*100000)) {
                 arrayList.add(freq);
                 if (ind <= 6) {
                     freqList.add(freq);
@@ -371,17 +367,17 @@ public class AudioReciever{
                 return 0;
             } else {
                 countPickesSpectrums.clear();
-                if (ampl_freq_distance > 1 && ampl_dist > 0.01) {
+//                if (ampl_freq_distance > 1 && ampl_dist > 0.01) {
                     return fr;
-                }
+//                }
             }
         } else {
             countPickesSpectrums.add(n_pickes);
-            if (ampl_freq_distance > 1 && ampl_dist > 0.01) {
+//            if (ampl_freq_distance > 1 && ampl_dist > 0.01) {
                 return fr;
-            }
+//            }
         }
-        return 0;
+//        return 0;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.tabnote;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -23,7 +23,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         loginFragments = findViewById(R.id.login_fragments);
 
         LogInFragment logInFragment = new LogInFragment();
-        changeFragment(getFragmentManager().beginTransaction(), logInFragment);
+        changeFragment(getSupportFragmentManager().beginTransaction(), logInFragment);
     }
 
     private void changeFragment(FragmentTransaction fragmentTransaction, Fragment fragment) {

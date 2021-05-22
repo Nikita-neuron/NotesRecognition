@@ -1,6 +1,6 @@
 package com.example.tabnote.ServerCommunication;
 
-public class Tab {
+public class Tab{
     private String username;
     private String title;
     private String body;

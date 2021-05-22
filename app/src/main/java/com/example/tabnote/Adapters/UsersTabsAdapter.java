@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tabnote.R;
 import com.example.tabnote.ServerCommunication.ServerMessages;
 import com.example.tabnote.ServerCommunication.Tab;
 import com.example.tabnote.TabActivity;
+import com.example.tabnote.TabComparator;
 import com.example.tabnote.TabPreview;
-import com.example.tabnote.database.DBManager;
 
 import org.json.JSONException;
 
@@ -34,6 +36,8 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
 
     Context context;
 
+    TabComparator tabComparator;
+
     public UsersTabsAdapter(List<Tab> tabList, String userName, Context context) {
         this.tabList = tabList;
         this.userName = userName;
@@ -41,6 +45,7 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
         serverMessages = ServerMessages.getInstance();
 
         this.context = context;
+        tabComparator = new TabComparator();
     }
 
     @Override
@@ -84,17 +89,21 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
 
         Tab tab = tabList.get(position);
 
-        TextView userName = holder.userName;
+        TextView userNameText = holder.userName;
         TextView title = holder.title;
         ImageView tabDelete = holder.tabDelete;
 
-        userName.setText(tab.getUsername());
+        userNameText.setText(tab.getUsername());
         title.setText(tab.getTitle());
 
         holder.view.setTag(R.string.usersTabId, position);
         tabDelete.setTag(R.string.usersTabDeleteId, position);
 
-        tabDelete.setOnClickListener(this);
+        if (tab.getUsername().equals(userName)) {
+            tabDelete.setOnClickListener(this);
+        } else {
+            tabDelete.setVisibility(ImageView.INVISIBLE);
+        }
         holder.view.setOnClickListener(this);
 
         String jsonText = tab.getBody();
@@ -135,6 +144,20 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
     public void swap(List<Tab> tabs) {
         tabList = tabs;
         notifyDataSetChanged();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void sort(String type) {
+
+        if (tabList != null && tabList.size() > 0) {
+            if (type.equals("name")) {
+                tabList.sort(tabComparator.sortByName());
+            }
+            else if (type.equals("userName")) {
+                tabList.sort(tabComparator.sortByUserName());
+            }
+            notifyDataSetChanged();
+        }
     }
 
     private boolean internetConnection(Context context) {

@@ -13,4 +13,20 @@
     <string name="usersTabId">userTabID</string>
     <string name="userTabShare">share</string>
     <string name="todo">TODO</string>
+    <string name="no_found">У вас нет сохранённых табулатур</string>
+    <string name="logIn">Войти</string>
+    <string name="tabsMenu">Табулатуры</string>
+    <string name="mainMenu">Главная</string>
+    <string name="addMenu">Добавить</string>
+    <string name="nameText">Имя</string>
+    <string name="passwordText">Пароль</string>
+    <string name="createAccText">Создать аккаунт</string>
+    <string name="signUpText">Зарегистрироваться</string>
+    <string name="no_internet">Нет подключения к интернету</string>
+    <string name="info_text1">
+        Tab Note это программа для создания гитарных табулатур путём автоматического преобразования звука. Приложение поддерживает только монофонические мелодии и имеет встроенный редактор табулатур. Программа может хранить сохранённые мелодии, как на телефоне, так и на сервере.
+    </string>
+    <string name="info_text2">
+        Для лучшего результата играйте медленно и громко.
+    </string>
 </resources>

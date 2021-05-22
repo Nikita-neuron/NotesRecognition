@@ -27,42 +27,6 @@
                 android:layout_centerVertical="true"
                 tools:ignore="ContentDescription" />
 
-            <TextView
-                android:id="@+id/textThreshold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Порог:"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="5dp"
-                android:layout_toEndOf="@+id/arrowBack" />
-
-            <Spinner
-                android:id="@+id/threshold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/textThreshold"/>
-
-            <TextView
-                android:id="@+id/frequencyText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:textSize="15sp"
-                android:text="Frequency: 0"/>
-
-            <ImageView
-                android:id="@+id/btnSaveTab"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/save"
-                tools:ignore="ContentDescription" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -123,15 +87,6 @@
 <!--                        </FrameLayout>-->
 
                     </LinearLayout>
-                    <ImageView
-                        android:id="@+id/add_note"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_add"
-                        android:contentDescription="@string/todo"
-                        android:layout_toEndOf="@+id/strings"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="4dp"/>
 
                 </RelativeLayout>
             </HorizontalScrollView>
@@ -194,7 +149,7 @@
 
             <ImageView
                 android:id="@+id/btnPausePlay"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
@@ -202,12 +157,40 @@
 
             <ImageView
                 android:id="@+id/btnPlay"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:layout_marginStart="20dp"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/btnPausePlay"
                 android:src="@drawable/play"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/textThreshold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Уровень шума:"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
+                android:layout_toStartOf="@+id/threshold"/>
+
+            <Spinner
+                android:id="@+id/threshold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/btnSaveTab"/>
+
+            <ImageView
+                android:id="@+id/btnSaveTab"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/btnClear"
+                android:src="@drawable/save"
                 tools:ignore="ContentDescription" />
 
             <ImageView

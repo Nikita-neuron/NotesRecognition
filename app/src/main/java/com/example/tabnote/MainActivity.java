@@ -2,7 +2,6 @@ package com.example.tabnote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,17 +11,19 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
-import android.app.Fragment;
-import android.widget.TextView;
-
+import com.example.tabnote.Fragments.InfoFragment;
 import com.example.tabnote.Fragments.UserFragment;
 import com.example.tabnote.Fragments.UsersTabsFragment;
 import com.example.tabnote.database.DBUserManager;
@@ -44,13 +45,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RelativeLayout topMenuUser;
     RelativeLayout userLogin;
 
+    ImageView tabInfo;
+
     Button btnUserLogin;
 
-//    TextView userTitleType;
     TextView userNameView;
 
     UserFragment userFragment;
     UsersTabsFragment usersTabsFragment;
+    InfoFragment infoFragment;
 
     String userName;
 
@@ -81,19 +84,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         dbUserManager = DBUserManager.getInstance(this);
 
-        try {
-            userName = getIntent().getExtras().getString("userName");
-        } catch (NullPointerException e) {
-            userName = "none";
-        }
+        userName = "none";
 
-        if (userName.equals("none")) {
+        String user = dbUserManager.existUser();
 
-            String user = dbUserManager.existUser();
-
-            if (!user.equals("")) {
-                userName = user;
-            }
+        if (!user.equals("")) {
+            userName = user;
         }
 
         fragmentsChange = findViewById(R.id.fragmentsChange);
@@ -109,11 +105,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         bottomMenu = findViewById(R.id.bottom_menu);
 
-//        userTitleType = findViewById(R.id.user_title_type);
         userNameView = findViewById(R.id.user_name);
 
         topMenuUser = findViewById(R.id.topMenuUser);
         userLogin = findViewById(R.id.user_login);
+
+        tabInfo = findViewById(R.id.tab_info);
+        tabInfo.setOnClickListener(this);
 
         Bundle bundle = new Bundle();
         bundle.putString("userName", userName);
@@ -124,9 +122,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         usersTabsFragment = new UsersTabsFragment();
         usersTabsFragment.setArguments(bundle);
 
-        activeMenuItem(btnHome);
+        infoFragment = new InfoFragment();
 
-        changeFragment(getFragmentManager().beginTransaction(), userFragment);
+        activeMenuItem(btnHome);
+        changeFragment(getSupportFragmentManager().beginTransaction(), userFragment);
 
         if (userName.equals("none")) {
             topMenuUser.setVisibility(View.INVISIBLE);
@@ -166,9 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_users_tabs:
                 activeMenuItem(btnUsersTabs);
 
-//                userTitleType.setText("Табулатуры пользователей");
-
-                changeFragment(getFragmentManager().beginTransaction(), usersTabsFragment);
+                changeFragment(getSupportFragmentManager().beginTransaction(), usersTabsFragment);
                 break;
             case R.id.btn_tab_add:
                 activeMenuItem(btnTabAdd);
@@ -181,9 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_home:
                 activeMenuItem(btnHome);
 
-//                userTitleType.setText("Ваши табулатуры");
-
-                changeFragment(getFragmentManager().beginTransaction(), userFragment);
+                changeFragment(getSupportFragmentManager().beginTransaction(), userFragment);
                 break;
             case R.id.btn_user_login:
                 Intent intent1 = new Intent(this, LogInActivity.class);
@@ -191,6 +186,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.topMenuUser:
                 showPopupMenu(v.getContext(), v);
+                break;
+            case R.id.tab_info:
+                changeFragment(getSupportFragmentManager().beginTransaction(), infoFragment);
                 break;
         }
     }
@@ -203,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if ("mPopup".equals(field.getName())) {
                     field.setAccessible(true);
                     Object menuPopupHelper = field.get(popupMenu);
+                    assert menuPopupHelper != null;
                     Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
                     Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
                     setForceIcons.invoke(menuPopupHelper, true);
@@ -226,6 +225,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             btnUserLogin = findViewById(R.id.btn_user_login);
             btnUserLogin.setOnClickListener(this);
+
+            userName = "none";
             return true;
         }
         return false;
