@@ -100,6 +100,7 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
         tabDelete.setTag(R.string.usersTabDeleteId, position);
 
         if (tab.getUsername().equals(userName)) {
+            tabDelete.setVisibility(ImageView.VISIBLE);
             tabDelete.setOnClickListener(this);
         } else {
             tabDelete.setVisibility(ImageView.INVISIBLE);
@@ -125,7 +126,6 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
         private final TextView userName;
         private final TextView title;
         private final ImageView tabDelete;
-        private final ImageView share;
         private final View view;
 
         public ViewHolder(View view) {
@@ -133,7 +133,7 @@ public class UsersTabsAdapter extends RecyclerView.Adapter<UsersTabsAdapter.View
             userName = view.findViewById(R.id.userNameTab);
             title = view.findViewById(R.id.userTabName);
             tabDelete = view.findViewById(R.id.usersTabDelete);
-            share = view.findViewById(R.id.share);
+            ImageView share = view.findViewById(R.id.share);
 
             ((ViewGroup) share.getParent()).removeView(share);
 

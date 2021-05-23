@@ -18,7 +18,6 @@ public class ServiceGenerator {
 //    interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 //    OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(interceptor);
 
-//    private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)

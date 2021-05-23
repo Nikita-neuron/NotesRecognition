@@ -9,7 +9,6 @@ public class DBUserManager {
 
     private final String tableName = "USER";
     private final String tableUserName = "NAME";
-    private final String tableUserBody = "PASSWORD";
 
     private final SQLiteDatabase db;
 
@@ -55,6 +54,7 @@ public class DBUserManager {
     }
 
     private void createTablesIfNeedBe() {
+        String tableUserBody = "PASSWORD";
         String request = String.format("CREATE TABLE IF NOT EXISTS %s (%s TEXT, %s TEXT);", tableName, tableUserName, tableUserBody);
         db.execSQL(request);
     }

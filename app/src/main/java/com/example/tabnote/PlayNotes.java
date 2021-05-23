@@ -11,8 +11,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,14 +28,14 @@ public class PlayNotes {
 
     private LinearLayout strings;
     private FrameLayout stringCurrent;
-    private ImageView btnPlay;
+    private final ImageView btnPlay;
 
-    private HorizontalScrollView scrollView;
+    private final HorizontalScrollView scrollView;
 
     Bitmap imagePlay;
     Bitmap imagePause;
 
-    private int countBegGriff;
+    private final int countBegGriff;
 
     PlayNotes(Context context, ArrayList<Note> notes, LinearLayout strings, ImageView btnPlay, HorizontalScrollView scrollView,
               int countBegGriff) {

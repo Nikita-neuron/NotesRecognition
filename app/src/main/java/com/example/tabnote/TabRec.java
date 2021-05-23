@@ -508,7 +508,7 @@ public class TabRec implements View.OnClickListener, View.OnLongClickListener{
             parent.removeViewAt(1);
         }
 
-        setNoteText(new int[]{0, noteFret}, "delete", parent, noteIndex);
+//        setNoteText(new int[]{0, noteFret}, "delete", parent, noteIndex);
 
         for (int i = 0; i < notesMargin.length; i++) {
             setNoteText(new int[]{i, noteFret}, "update", parent, noteIndex);
