@@ -81,13 +81,6 @@ public class AudioReciever{
 
         audioRecord.startRecording();
         Thread rthread = new Thread(() -> {
-            if (Thread.interrupted()) {
-                try {
-                    throw new InterruptedException();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             while (running) {
                 try {
                     audioRecord.read(buffer, 0, bufferSize);
