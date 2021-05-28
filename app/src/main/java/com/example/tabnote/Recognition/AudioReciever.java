@@ -60,14 +60,16 @@ public class AudioReciever{
 
     public void stop() {
         running = false;
+        audioRecord.stop();
     }
 
     protected void loopback() {
 
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+//        final int bufferSize = 32768;
 //        final int bufferSize = 16384;
-//        final int bufferSize = 8192;
-        final int bufferSize = 4096;
+        final int bufferSize = 8192;
+//        final int bufferSize = 4096;
 
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, freq,
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
